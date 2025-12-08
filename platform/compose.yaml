@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  # MySQL 数据库服务
+  youguang-db:
+    image: mysql:8.0
+    container_name: youguang_mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: youguang_db
+      MYSQL_ROOT_PASSWORD: 123456
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    # === 新增：数据持久化 ===
+    volumes:
+      # 将容器内的数据库文件映射到当前目录下的 mysql-data 文件夹
+      - ./mysql-data:/var/lib/mysql
+
+  # Redis 缓存服务
+  youguang-redis:
+    image: redis:latest
+    container_name: youguang_redis
+    ports:
+      - "6379:6379"

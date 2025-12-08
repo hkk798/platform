@@ -1,0 +1,23 @@
+server:
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 注意：这里必须填 3307，因为您的 docker compose 里写的是 3307:3306
+    url: jdbc:mysql://localhost:3307/youguang_db?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8
+    username: root
+    # 这里必须填 docker compose 里设置的密码
+    password: "123456"
+
+  port: 8080 # 项目启动端口
+
+  # Thymeleaf 前端模板配置
+  thymeleaf:
+    cache: false      # 开发时关闭缓存，改了页面刷新就能看到
+    mode: HTML
+
+# MyBatis 配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml  # SQL写在这里面
+  configuration:
+    map-underscore-to-camel-case: true      # 开启驼峰命名转换
