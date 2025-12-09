@@ -36,4 +36,9 @@ public interface ProductMapper {
     // 只有当库存 > 0 时才扣减，返回影响的行数（1表示成功，0表示库存不足）
     @Update("UPDATE product SET stock = stock - #{quantity} WHERE product_id = #{productId} AND stock >= #{quantity}")
     int reduceStock(Long productId, int quantity);
+
+
+    // === 新增：查询最新上架的 3 个商品（用于首页推荐） ===
+    @Select("SELECT * FROM product ORDER BY release_date DESC LIMIT 3")
+    List<Product> findNewArrivals();
 }
