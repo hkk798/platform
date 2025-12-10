@@ -39,6 +39,11 @@ public class Product {
     /** 分类 ID */
     private Long categoryId;
 
+    /** 卖家ID (新增) */
+    private Long sellerId;
+
+    /** 商品状态 (0:在售, 1:已售出) */
+    private Integer status;
     // ================= Getter & Setter =================
 
     public Long getProductId() { return productId; }
@@ -70,4 +75,13 @@ public class Product {
 
     public Long getCategoryId() { return categoryId; }
     public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+
+    // ... Getter & Setter ...
+    public Long getSellerId() { return sellerId; }
+    public void setSellerId(Long sellerId) { this.sellerId = sellerId; }
+
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
+
+
 }

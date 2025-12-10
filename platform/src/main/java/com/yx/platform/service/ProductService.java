@@ -39,4 +39,7 @@ public interface ProductService {
      * 购买商品（扣减库存）
      */
     boolean buyProduct(Long productId, int quantity);
+
+
+    void publishProduct(Product product, Long userId);
 }

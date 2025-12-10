@@ -41,4 +41,13 @@ public interface ProductMapper {
     // === 新增：查询最新上架的 3 个商品（用于首页推荐） ===
     @Select("SELECT * FROM product ORDER BY release_date DESC LIMIT 3")
     List<Product> findNewArrivals();
+
+    // [新增] 用户发布商品
+    @org.apache.ibatis.annotations.Insert("INSERT INTO product(prod_name, description, price, stock, platform, genre, publisher, release_date, seller_id, status) " +
+            "VALUES(#{prodName}, #{description}, #{price}, #{stock}, #{platform}, #{genre}, #{publisher}, #{releaseDate}, #{sellerId}, 0)")
+    void save(Product product);
+
+    // [可选] 查询某个用户发布的所有商品（即“我的闲置”）
+    @Select("SELECT * FROM product WHERE seller_id = #{userId}")
+    List<Product> findBySellerId(Long userId);
 }
