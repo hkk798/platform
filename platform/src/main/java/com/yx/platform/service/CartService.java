@@ -1,5 +1,6 @@
 package com.yx.platform.service;
 
+import com.yx.platform.entity.Order;
 import com.yx.platform.entity.CartItemVo;
 import com.yx.platform.mapper.CartMapper;
 import com.yx.platform.mapper.OrderMapper;
@@ -77,17 +78,21 @@ public class CartService {
 
         if (items.isEmpty()) return false;
 
-        // 1. 计算总价
+// 1. 计算总价
         BigDecimal totalAmount = calculateTotal(items);
 
-        // 2. 创建订单 (这里需要一个 Order 实体来接收 ID，简单演示用)
-        // Order order = new Order(); order.setUserId(userId); ...
-        // orderMapper.createOrder(order);
-        // Long orderId = order.getOrderId();
+        // ================= 修复开始 =================
+        // 2. 创建真实订单
+        Order order = new Order();
+        order.setUserId(userId);
+        order.setTotalAmount(totalAmount);
 
-        // 模拟订单ID生成
-        Long orderId = System.currentTimeMillis();
-        // 实际上应该调用 orderMapper.createOrder 并在 Mapper XML 中配置 keyProperty
+        // 保存到数据库 (MyBatis 会自动把生成的 ID 填回 order 对象里)
+        orderMapper.createOrder(order);
+
+        // 获取真正的数据库 ID
+        Long orderId = order.getOrderId();
+        // ================= 修复结束 =================
 
         // 3. 转移数据：购物车 -> 订单项
         for (CartItemVo item : items) {

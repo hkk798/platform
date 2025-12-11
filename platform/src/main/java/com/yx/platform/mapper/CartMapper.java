@@ -14,7 +14,6 @@ public interface CartMapper {
 
     // 2. 创建新购物车
     @Insert("INSERT INTO cart(user_id) VALUES(#{userId})")
-    @Options(useGeneratedKeys = true, keyProperty = "cartId", keyColumn = "cart_id") //哪怕是void，MyBatis也会回填ID
     void createCart(Long userId); // 这里稍微修改一下参数传递方式，或者用对象
 
     // 3. 查找购物车里是否已经有这个商品
