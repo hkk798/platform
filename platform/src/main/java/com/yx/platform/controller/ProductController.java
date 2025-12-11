@@ -1,11 +1,13 @@
 package com.yx.platform.controller;
 
 import com.yx.platform.entity.Product;
+import com.yx.platform.entity.SysUser;
 import com.yx.platform.service.ProductService; // 引入 Service
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 
@@ -91,14 +93,18 @@ public class ProductController {
 
     // === 2. 处理提交的商品数据 ===
     @PostMapping("/product/publish")
-    public String handlePublish(Product product) {
-        // 【注意】实际项目中，这里需要获取当前登录用户的ID
-        // 假设当前登录用户ID是 1001 (这里先写死用于测试)
-        Long currentUserId = 1001L;
+    public String handlePublish(Product product, HttpSession session) {
+        // 1. 获取当前登录用户
+        SysUser user = (SysUser) session.getAttribute("currentUser");
 
-        productService.publishProduct(product, currentUserId);
+        // 2. 如果没登录，踢去登录页
+        if (user == null) {
+            return "redirect:/login";
+        }
 
-        // 发布成功后，重定向回首页，或者去“我的发布”页面
+        // 3. 使用真实的 ID
+        productService.publishProduct(product, user.getId());
+
         return "redirect:/";
     }
 }
