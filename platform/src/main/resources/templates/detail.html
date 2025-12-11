@@ -40,7 +40,7 @@
 
       <h2 class="text-warning my-4">￥<span th:text="${product.price}">399.00</span></h2>
 
-      <form action="/product/buy" method="post" class="d-flex align-items-center gap-3">
+      <form action="/cart/add" method="post" class="d-flex align-items-center gap-3">
         <input type="hidden" name="productId" th:value="${product.productId}">
 
         <div class="input-group" style="width: 150px;">
@@ -48,8 +48,8 @@
           <input type="number" name="quantity" class="form-control bg-dark text-light border-secondary" value="1" min="1" th:max="${product.stock}">
         </div>
 
-        <button type="submit" class="btn btn-lg btn-danger px-5" th:disabled="${product.stock <= 0}">
-          <span th:if="${product.stock > 0}">立即购买</span>
+        <button type="submit" class="btn btn-lg btn-warning px-5" th:disabled="${product.stock <= 0}">
+          <span th:if="${product.stock > 0}">🛒 加入购物车</span>
           <span th:if="${product.stock <= 0}">缺货中</span>
         </button>
       </form>

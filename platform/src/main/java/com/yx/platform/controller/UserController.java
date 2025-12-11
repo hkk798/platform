@@ -2,70 +2,92 @@ package com.yx.platform.controller;
 
 import com.yx.platform.entity.SysUser;
 import com.yx.platform.mapper.UserMapper;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller; // 注意这里换成了 Controller
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody; // 新增这个
 
 import java.util.List;
 
-// @RestController 告诉 Spring：我是个服务员，专门负责给浏览器返回数据（通常是 JSON 格式）
-@RestController
+@Controller // 1. 改为 @Controller，这样才能实现页面跳转
 public class UserController {
 
-    // @Autowired 意思是：自动注入。
-    // 就像服务员不需要自己招聘厨师，餐厅（Spring）会自动给它分配一个做好了的 UserMapper
     @Autowired
     private UserMapper userMapper;
 
-    // @GetMapping("/user") 意思是：
-    // 当浏览器访问地址 http://localhost:8080/user 时，就运行下面这个方法
+    // === 注册接口 ===
+    @PostMapping("/register")
+    // 2. 去掉 @RequestBody，直接用 SysUser 接收表单数据
+    public String register(SysUser user) {
+        // 保存到数据库
+        userMapper.save(user);
+
+        // 3. 注册成功后，重定向跳转到登录页面
+        return "redirect:/login";
+    }
+
+    // === 登录接口 ===
+    @PostMapping("/login")
+    public String login(String username, String password, HttpSession session) {
+        SysUser user = userMapper.login(username, password);
+        if (user != null) {
+            session.setAttribute("currentUser", user);
+            // 登录成功，跳回首页
+            return "redirect:/";
+        } else {
+            // 登录失败，跳回登录页并带上错误标记
+            return "redirect:/login?error=true";
+        }
+    }
+
+    // === (可选)原来的测试接口，如果你还想看 JSON 数据，就加上 @ResponseBody ===
     @GetMapping("/user")
+    @ResponseBody
     public List<SysUser> list() {
-        // 调用 Mapper 去数据库查所有用户，然后直接返回
         return userMapper.findAll();
     }
 
-    // 新增：注册接口
-    // @PostMapping 专门用来接收“保存/新增”数据的请求
-    // @RequestBody 的意思是：请把浏览器发来的 JSON 数据，自动拼装成 SysUser 对象
-    @org.springframework.web.bind.annotation.PostMapping("/register")
-    public String register(@org.springframework.web.bind.annotation.RequestBody SysUser user) {
-        // 1. 调用 Mapper 把数据存进数据库
-        userMapper.save(user);
-        // 2. 告诉浏览器：搞定了！
-        return "注册成功！";
+    // === 1. 退出登录 ===
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        // 销毁 session，相当于把用户踢下线
+        session.invalidate();
+        // 跳回首页
+        return "redirect:/";
     }
 
-
-    // =========== 临时测试用的作弊通道 ===========
-    // 注意：平时开发不能这么写，因为把密码放在网址里不安全。
-    // 但为了测试，我们先这样用一下！
-    @GetMapping("/test/register")
-    public String testRegister(String username, String password) {
-        // 1. 手动创建一个新用户对象
-        SysUser user = new SysUser();
-        user.setUsername(username);
-        user.setPassword(password);
-
-        // 2. 让 Mapper 把这个对象存进去
-        userMapper.save(user);
-
-        return "测试注册成功！用户：" + username;
-    }
-
-    // =========== 临时测试登录接口 ===========
-    @GetMapping("/test/login")
-    public String testLogin(String username, String password) {
-        // 1. 调用 Mapper 去查查有没有这个人
-        SysUser user = userMapper.login(username, password);
-
-        // 2. 判断结果
-        if (user != null) {
-            // 如果 user 不是空的，说明查到了 -> 登录成功
-            return "登录成功！欢迎回来，" + user.getUsername();
-        } else {
-            // 如果 user 是空的，说明没查到 -> 登录失败
-            return "登录失败！账号或密码错啦！";
+    // === 2. 跳转到修改密码页面 ===
+    @GetMapping("/user/password")
+    public String passwordPage(HttpSession session) {
+        // 如果没登录，先去登录
+        if (session.getAttribute("currentUser") == null) {
+            return "redirect:/login";
         }
+        return "password"; // 对应 templates/password.html
+    }
+
+    // === 3. 执行修改密码 ===
+    @PostMapping("/user/password")
+    public String updatePassword(String oldPassword, String newPassword, HttpSession session, org.springframework.ui.Model model) {
+        SysUser currentUser = (SysUser) session.getAttribute("currentUser");
+        if (currentUser == null) return "redirect:/login";
+
+        // 1. 验证旧密码是否正确（为了安全，建议查库对比）
+        // 这里简单直接比对当前 session 里的或者重新查库
+        SysUser userInDb = userMapper.login(currentUser.getUsername(), oldPassword);
+
+        if (userInDb == null) {
+            model.addAttribute("error", "旧密码错误！");
+            return "password";
+        }
+
+        // 2. 更新密码
+        userMapper.updatePassword(currentUser.getId(), newPassword);
+
+        // 3. 修改成功后，强制退出，让用户重新登录
+        session.invalidate();
+        return "redirect:/login?msg=passwordChanged";
     }
 }

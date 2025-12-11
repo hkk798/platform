@@ -15,17 +15,32 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark mb-4">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="/">💿 游光阁</a>
-        <div class="d-flex">
-            <form action="/search" method="get" class="d-flex">
-                <input class="form-control me-2 bg-dark text-light border-secondary" type="search" name="keyword" placeholder="搜游戏..." th:value="${keyword}">
-                <button class="btn btn-primary" type="submit">搜索</button>
-            </form>
+    <div class="d-flex align-items-center">
 
-            <a href="/product/publish" class="btn btn-warning text-dark fw-bold">
+        <div th:if="${session.currentUser == null}">
+            <a href="/login" class="btn btn-outline-secondary me-2">登录</a>
+            <a href="/register" class="btn btn-primary">注册</a>
+        </div>
+
+        <div th:if="${session.currentUser != null}" class="dropdown">
+            <a href="/cart" class="btn btn-outline-warning me-3 position-relative">
+                🛒 购物车
+            </a>
+
+            <a href="/product/publish" class="btn btn-warning text-dark fw-bold me-3">
                 💰 我要卖
             </a>
+
+            <button class="btn btn-dark border-secondary dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                👤 <span th:text="${session.currentUser.username}">用户名</span>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="userMenu">
+                <li><a class="dropdown-item" href="#">📦 我的订单 (待开发)</a></li>
+                <li><a class="dropdown-item" href="/user/password">🔐 修改密码</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="/logout">🚪 退出登录</a></li>
+            </ul>
         </div>
     </div>
 </nav>
@@ -105,5 +120,7 @@
     </div>
 </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

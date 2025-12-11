@@ -2,6 +2,7 @@ package com.yx.platform.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import com.yx.platform.entity.SysUser; // ⚠️确保这里导入了你刚才写的实体类
 import java.util.List;
 
@@ -23,4 +24,12 @@ public interface UserMapper {
     // 意思就是：去找找有没有同时满足 "username=?" 和 "password=?" 的人
     @Select("SELECT * FROM sys_user WHERE username = #{username} AND password = #{password}")
     SysUser login(String username, String password);
+
+    // 修改密码
+    @Update("UPDATE sys_user SET password = #{newPassword} WHERE id = #{userId}")
+    void updatePassword(Long userId, String newPassword);
+
+    // (可选) 根据ID查用户，用于验证旧密码
+    @Select("SELECT * FROM sys_user WHERE id = #{id}")
+    SysUser findById(Long id);
 }
