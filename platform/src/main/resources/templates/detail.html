@@ -45,7 +45,9 @@
 
         <div class="input-group" style="width: 150px;">
           <span class="input-group-text bg-dark text-light border-secondary">数量</span>
-          <input type="number" name="quantity" class="form-control bg-dark text-light border-secondary" value="1" min="1" th:max="${product.stock}">
+          <input type="number" name="quantity" class="form-control bg-dark text-light border-secondary"
+                 value="1" min="1" th:max="${product.stock}"
+                 required>
         </div>
 
         <button type="submit" class="btn btn-lg btn-warning px-5" th:disabled="${product.stock <= 0}">

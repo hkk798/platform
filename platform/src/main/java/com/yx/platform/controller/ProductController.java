@@ -82,29 +82,4 @@ public class ProductController {
         }
     }
 
-
-    // === 1. 跳转到“发布商品”页面 ===
-    @GetMapping("/product/publish")
-    public String showPublishPage(Model model) {
-        // 这里可以传一个空对象，方便前端表单绑定
-        model.addAttribute("product", new Product());
-        return "publish"; // 对应 templates/publish.html
-    }
-
-    // === 2. 处理提交的商品数据 ===
-    @PostMapping("/product/publish")
-    public String handlePublish(Product product, HttpSession session) {
-        // 1. 获取当前登录用户
-        SysUser user = (SysUser) session.getAttribute("currentUser");
-
-        // 2. 如果没登录，踢去登录页
-        if (user == null) {
-            return "redirect:/login";
-        }
-
-        // 3. 使用真实的 ID
-        productService.publishProduct(product, user.getId());
-
-        return "redirect:/";
-    }
 }

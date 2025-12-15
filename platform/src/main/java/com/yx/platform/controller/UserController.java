@@ -55,7 +55,7 @@ public class UserController {
         // 销毁 session，相当于把用户踢下线
         session.invalidate();
         // 跳回首页
-        return "redirect:/";
+        return "redirect:/login?msg=logout";
     }
 
     // === 2. 跳转到修改密码页面 ===

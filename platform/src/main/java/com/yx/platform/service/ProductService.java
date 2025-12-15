@@ -40,6 +40,4 @@ public interface ProductService {
      */
     boolean buyProduct(Long productId, int quantity);
 
-
-    void publishProduct(Product product, Long userId);
 }
