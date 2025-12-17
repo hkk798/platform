@@ -10,7 +10,8 @@
     .table { color: #e0e0e0; }
     .table thead { background-color: #2c2c2c; }
     .btn-quantity { background-color: #333; color: white; border: 1px solid #555; width: 30px; height: 30px; padding: 0; line-height: 28px; }
-    .img-thumbnail { background-color: #333; border-color: #444; }
+    /* 调整图片样式 */
+    .cart-img { width: 100px; height: 60px; object-fit: cover; border-radius: 4px; background-color: #333; }
   </style>
 </head>
 <body>
@@ -29,22 +30,22 @@
     <table class="table table-hover align-middle">
       <thead>
       <tr>
-        <th scope="col" width="10%">封面</th>
+        <th scope="col" width="15%">封面</th>
         <th scope="col" width="30%">商品信息</th>
         <th scope="col" width="15%">单价</th>
         <th scope="col" width="20%">数量</th>
-        <th scope="col" width="15%">小计</th>
+        <th scope="col" width="10%">小计</th>
         <th scope="col" width="10%">操作</th>
       </tr>
       </thead>
       <tbody>
       <tr th:each="item : ${cartItems}">
         <td>
-          <div style="width: 60px; height: 60px; background: #333; display: flex; align-items: center; justify-content: center; color: #777;">图</div>
+          <img th:src="${item.platform}" class="cart-img" alt="封面" onerror="this.style.display='none'">
         </td>
         <td>
           <h6 class="mb-0 text-info" th:text="${item.productName}">游戏名</h6>
-          <small class="text-muted" th:text="${item.platform}">PS5</small>
+          <small class="text-muted">Digital Key</small>
         </td>
         <td>￥<span th:text="${item.price}">299</span></td>
         <td>
@@ -73,7 +74,6 @@
     <a href="/" class="btn btn-primary mt-3">去逛逛</a>
   </div>
 </div>
-
 
 <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>

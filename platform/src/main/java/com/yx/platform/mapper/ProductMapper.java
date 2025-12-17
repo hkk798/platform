@@ -10,36 +10,33 @@ import java.util.List;
 @Mapper
 public interface ProductMapper {
 
-    // 1. 首页展示：查询所有商品（或者可以加 limit 限制数量）
-    @Select("SELECT * FROM product")
+    // 1. 首页展示：只查前 50 条，防止浏览器卡死
+    @Select("SELECT * FROM product LIMIT 50")
     List<Product> findAll();
 
-    // 2. 搜索功能：根据商品名称模糊查询
-    // CONCAT('%', #{keyword}, '%') 是 MySQL 的模糊匹配写法
-    @Select("SELECT * FROM product WHERE prod_name LIKE CONCAT('%', #{keyword}, '%')")
+    // 2. 搜索：prod_name 变成了 name
+    @Select("SELECT * FROM product WHERE name LIKE CONCAT('%', #{keyword}, '%')")
     List<Product> searchByName(String keyword);
 
-    // 3. 筛选功能：根据平台 (Platform) 和类型 (Genre) 筛选 [cite: 23]
-    // <script> 标签允许我们在 SQL 里写 if 判断，实现动态筛选
+    // 3. 筛选：platform 没了，genre 变成了 genres
+    // 我们可以把原来的“平台筛选”改成“开发商筛选”或者暂时去掉平台筛选
+    // 下面代码保留了 genres 的筛选（模糊匹配，因为现在 genres 可能是 "Action, RPG"）
     @Select("<script>" +
-            "SELECT * FROM product WHERE 1=1" +
-            "<if test='platform != null and platform != \"\"'> AND platform = #{platform} </if>" +
-            "<if test='genre != null and genre != \"\"'> AND genre = #{genre} </if>" +
+            "SELECT * FROM product WHERE 1=1 " +
+            "<if test='genre != null and genre != \"\"'> AND genres LIKE CONCAT('%', #{genre}, '%') </if>" +
+            "LIMIT 50 "+
             "</script>")
     List<Product> filter(String platform, String genre);
 
-    // 4. 商品详情：根据 ID 查询单个商品
-    @Select("SELECT * FROM product WHERE product_id = #{id}")
+    // 4. 详情：product_id 变成了 app_id
+    @Select("SELECT * FROM product WHERE app_id = #{id}")
     Product findById(Long id);
 
-    // 5. 购买逻辑：扣减库存
-    // 只有当库存 > 0 时才扣减，返回影响的行数（1表示成功，0表示库存不足）
-    @Update("UPDATE product SET stock = stock - #{quantity} WHERE product_id = #{productId} AND stock >= #{quantity}")
+    // 5. 扣库存：product_id 变成了 app_id
+    @Update("UPDATE product SET stock = stock - #{quantity} WHERE app_id = #{productId} AND stock >= #{quantity}")
     int reduceStock(Long productId, int quantity);
 
-
-    // === 新增：查询最新上架的 3 个商品（用于首页推荐） ===
+    // 新增：最新上架
     @Select("SELECT * FROM product ORDER BY release_date DESC LIMIT 3")
     List<Product> findNewArrivals();
-
 }

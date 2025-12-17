@@ -30,9 +30,9 @@ public interface CartMapper {
 
     // 6. 获取购物车详情列表 (多表关联查询：CartItem -> Product)
     @Select("SELECT ci.item_id as cartItemId, ci.product_id as productId, ci.quantity, " +
-            "p.prod_name as productName, p.price, p.platform " +
+            "p.name as productName, p.price, p.header_image as platform " + // 临时把图片借给platform字段用，或者去CartItemVo里把platform字段改成image
             "FROM cart_item ci " +
-            "LEFT JOIN product p ON ci.product_id = p.product_id " +
+            "LEFT JOIN product p ON ci.product_id = p.app_id " + // 注意关联键变成了 app_id
             "WHERE ci.cart_id = #{cartId}")
     List<CartItemVo> findCartItems(Long cartId);
 
