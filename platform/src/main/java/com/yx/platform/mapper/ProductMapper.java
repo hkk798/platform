@@ -4,6 +4,7 @@ import com.yx.platform.entity.Product;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public interface ProductMapper {
             "<if test='genre != null and genre != \"\"'> AND genres LIKE CONCAT('%', #{genre}, '%') </if>" +
             "LIMIT 50 "+
             "</script>")
-    List<Product> filter(String platform, String genre);
+    List<Product> filter(@Param("platform") String platform, @Param("genre") String genre);
 
     // 4. 详情：注意这里用 app_id (请确保您执行了第一步的 SQL 改名)
     @Select("SELECT * FROM product1 WHERE appid = #{id}")
