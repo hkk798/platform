@@ -33,6 +33,20 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+
+    // === 新增实现 ===
+    @Override
+    public List<Product> getTopCcuProducts() {
+        return productMapper.findTop10ByPeakCcu();
+    }
+
+    @Override
+    public List<Product> getMostReviewedProducts() {
+        return productMapper.findTop10ByReviews();
+    }
+    // === 结束新增 ===
+
+
     @Override
     public List<Product> getRecommendedProducts() {
         // 业务逻辑：调用 Mapper 查询最新的 3 款游戏作为推荐

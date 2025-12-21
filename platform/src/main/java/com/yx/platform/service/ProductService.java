@@ -30,6 +30,12 @@ public interface ProductService {
      */
     List<Product> getRecommendedProducts();
 
+
+    // === 新增接口方法 ===
+    List<Product> getTopCcuProducts();      // 获取 CCU 前10
+    List<Product> getMostReviewedProducts(); // 获取 评论数 前10
+
+
     /**
      * 获取商品详情
      */

@@ -2,70 +2,349 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>商品详情 - 游光阁</title>
+  <title th:text="${product.name} + ' - 详情'">商品详情</title>
   <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <style>
-    body { background-color: #121212; color: #e0e0e0; }
-    .detail-box { background-color: #1e1e1e; padding: 40px; border-radius: 12px; margin-top: 30px; }
+    /* === 全局深色主题 === */
+    body { background-color: #121212; color: #c7d5e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .detail-container { max-width: 1200px; margin-top: 30px; margin-bottom: 80px; }
+
+    /* === 顶部区域 (保持不变) === */
+    .game-cover-main { width: 100%; border-radius: 4px; box-shadow: 0 0 10px rgba(0,0,0,0.5); object-fit: cover; }
+    .game-title { color: #ffffff; font-weight: bold; font-size: 2.5rem; margin-bottom: 10px; }
+    .stats-bar { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 5px; margin-bottom: 20px; display: flex; gap: 15px; }
+    .stat-item { font-size: 0.9rem; color: #8f98a0; }
+    .stat-value { color: #66c0f4; font-weight: bold; margin-left: 5px; }
+    .dev-info { font-size: 0.9rem; color: #56606a; margin-bottom: 20px; }
+    .dev-info span { color: #66c0f4; margin-right: 15px; }
+    .buy-card { background: linear-gradient(to right, rgba(0,0,0,0.3), rgba(0,0,0,0.1)); border-radius: 5px; padding: 20px; border: 1px solid #333; position: relative; overflow: hidden; }
+    .price-tag { font-size: 1.8rem; color: #d4e157; font-weight: bold; }
+
+    /* === 分区通用样式 === */
+    .section-wrapper { margin-top: 50px; }
+    .section-header { border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; color: #fff; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+    .section-header i { color: #66c0f4; }
+    .rich-content { color: #acb2b8; line-height: 1.8; font-size: 1rem; }
+    .rich-content img { max-width: 100%; height: auto; display: block; margin: 15px 0; border-radius: 4px; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
+    .screenshot-card img { width: 100%; border-radius: 4px; border: 1px solid #333; cursor: zoom-in; transition: transform 0.2s; }
+    .screenshot-card img:hover { transform: translateY(-5px); border-color: #66c0f4; }
+
+    /* === 重新设计的视频轮播样式 === */
+    .video-carousel-wrapper {
+        position: relative;
+        background: #000;
+        border: 1px solid #444;
+        border-radius: 8px;
+        overflow: hidden;
+        aspect-ratio: 16/9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer; /* 提示可点击 */
+    }
+
+    /* 视频元素本身 (去掉了 controls，点击它也能播放暂停) */
+    .video-player {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        z-index: 1;
+    }
+
+    /* === 新的核心控制区 (居中显示) === */
+    .center-controls-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        gap: 30px; /* 按钮之间的间距 */
+
+        /* 背景样式：半透明黑色圆角矩形 */
+        background: rgba(0, 0, 0, 0.5);
+        padding: 20px 40px;
+        border-radius: 60px;
+        backdrop-filter: blur(5px); /* 毛玻璃效果 */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        /* 动画：默认显示，播放时隐藏，悬停时显示 */
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
+
+    /* 当视频容器被添加了 .playing 类时，隐藏控件 */
+    .video-carousel-wrapper.playing .center-controls-overlay {
+        opacity: 0;
+        pointer-events: none; /* 隐藏时不可点击，防止误触 */
+    }
+
+    /* 鼠标悬停在视频容器上时，始终显示控件 */
+    .video-carousel-wrapper:hover .center-controls-overlay {
+        opacity: 1 !important;
+        pointer-events: auto;
+    }
+
+    /* 控制按钮通用样式 */
+    .control-btn {
+        color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .control-btn:hover {
+        color: #66c0f4; /* Steam 蓝 */
+        transform: scale(1.1);
+    }
+
+    /* 左右切换箭头图标大小 */
+    .nav-arrow-icon { font-size: 3rem; }
+
+    /* 中间播放/暂停按钮图标大小 */
+    .play-pause-icon { font-size: 4.5rem; }
+
+
+    /* 计数器 (右上角) */
+    .vid-counter {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0,0,0,0.7);
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        z-index: 20;
+        border: 1px solid #555;
+        pointer-events: none;
+    }
   </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark bg-black mb-4">
+<nav class="navbar navbar-dark bg-black border-bottom border-secondary mb-4">
   <div class="container">
-    <a class="navbar-brand" href="/">← 返回首页</a>
+    <a class="navbar-brand text-warning fw-bold" href="/"> <i class="bi bi-controller"></i> 游光阁 </a>
+    <a href="/" class="btn btn-outline-secondary btn-sm">← 返回首页</a>
   </div>
 </nav>
 
-<div class="container detail-box">
-  <div class="row">
-    <div class="col-md-5">
-      <img th:if="${product.headerImage != null}" th:src="${product.headerImage}"
-           class="img-fluid rounded shadow" style="width: 100%; object-fit: cover;" alt="游戏封面">
+<div class="container detail-container">
 
-      <div th:if="${product.headerImage == null}" class="bg-secondary d-flex align-items-center justify-content-center text-dark" style="height: 400px; border-radius: 8px;">
-        <h2>暂无封面</h2>
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="ratio ratio-16x9 bg-black rounded shadow">
+        <img th:src="${product.headerImage}" class="game-cover-main" onerror="this.src='https://via.placeholder.com/800x450?text=No+Media'">
       </div>
     </div>
-
-    <div class="col-md-7">
-      <h1 class="display-5 fw-bold text-info" th:text="${product.name}">游戏名称</h1>
-
-      <p class="lead mt-3" th:text="${product.shortDescription}">游戏详细描述...</p>
-
-      <hr class="border-secondary">
-
-      <div class="row mb-3">
-        <div class="col-6"><strong>开发商：</strong> <span th:text="${product.developers}">Valve</span></div>
-
-        <div class="col-6"><strong>类型：</strong> <span th:text="${product.genres}">RPG</span></div>
-
-        <div class="col-6 mt-2"><strong>发行商：</strong> <span th:text="${product.publishers}">Sony</span></div>
-
-        <div class="col-6 mt-2"><strong>库存：</strong> <span class="text-success" th:text="${product.stock}">99</span></div>
-      </div>
-
-      <h2 class="text-warning my-4">￥<span th:text="${product.price}">399.00</span></h2>
-
-      <form action="/cart/add" method="post" class="d-flex align-items-center gap-3">
-        <input type="hidden" name="productId" th:value="${product.productId}">
-
-        <div class="input-group" style="width: 150px;">
-          <span class="input-group-text bg-dark text-light border-secondary">数量</span>
-          <input type="number" name="quantity" class="form-control bg-dark text-light border-secondary"
-                 value="1" min="1" th:max="${product.stock}"
-                 required>
+    <div class="col-lg-4 d-flex flex-column justify-content-between">
+      <div>
+        <h1 class="game-title" th:text="${product.name}">游戏名称</h1>
+        <div class="stats-bar">
+          <div class="stat-item">在线: <span class="stat-value text-danger" th:text="${product.peakCcu ?: '-'}">0</span></div>
+          <div class="stat-item">好评: <span class="stat-value text-info" th:text="${product.numReviewsTotal ?: '-'}">0</span></div>
+          <div class="stat-item">发行: <span class="stat-value text-white" th:text="${product.releaseDate ?: '未知'}">2023</span></div>
         </div>
-
-        <button type="submit" class="btn btn-lg btn-warning px-5" th:disabled="${product.stock <= 0}">
-          <span th:if="${product.stock > 0}">🛒 加入购物车</span>
-          <span th:if="${product.stock <= 0}">缺货中</span>
-        </button>
-      </form>
+        <p class="text-secondary mb-4" th:text="${product.shortDescription}">简介...</p>
+        <div class="dev-info">
+          <div>开发商: <span th:text="${product.developers}">Valve</span></div>
+          <div class="mt-1">发行商: <span th:text="${product.publishers}">Valve</span></div>
+          <div class="mt-2">标签: <span class="badge bg-secondary text-light fw-normal" th:text="${product.genres}">Action</span></div>
+        </div>
+      </div>
+      <div class="buy-card mt-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-white fs-5">购买游戏</span>
+          <div class="price-tag">
+            <span th:if="${product.price == 0}">免费</span>
+            <span th:if="${product.price > 0}">￥<span th:text="${product.price}">0.00</span></span>
+          </div>
+        </div>
+        <form action="/cart/add" method="post" class="d-grid gap-2">
+          <input type="hidden" name="productId" th:value="${product.productId}">
+          <div class="input-group">
+            <span class="input-group-text bg-dark text-secondary border-secondary">数量</span>
+            <input type="number" name="quantity" class="form-control bg-dark text-white border-secondary text-center" value="1" min="1" th:max="${product.stock}">
+            <button type="submit" class="btn btn-success fw-bold px-4" th:disabled="${product.stock <= 0}">加入购物车</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
+
+  <div class="section-wrapper">
+    <h3 class="section-header"><i class="bi bi-file-earmark-text"></i> 关于这款游戏</h3>
+    <div class="row">
+      <div class="col-12">
+        <div class="rich-content" th:utext="${product.detailedDescription}">
+          <p class="text-muted">暂无详细介绍...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-wrapper" id="screenshotSection" style="display: none;">
+    <h3 class="section-header"><i class="bi bi-images"></i> 游戏截图</h3>
+    <div class="col-12">
+      <div id="screenshotContainer" class="gallery-grid"></div>
+    </div>
+  </div>
+
+  <div class="section-wrapper" id="videoSection" style="display: none;">
+    <h3 class="section-header"><i class="bi bi-film"></i> 宣传视频库</h3>
+    <div class="col-12">
+
+      <div class="video-carousel-wrapper" id="videoWrapper">
+        <video id="mainVideoPlayer" class="video-player" preload="metadata">
+          您的浏览器不支持 HTML5 视频。
+        </video>
+
+        <div class="center-controls-overlay">
+          <div class="control-btn nav-arrow-icon" id="btnPrev">
+            <i class="bi bi-chevron-left"></i>
+          </div>
+
+          <div class="control-btn play-pause-icon" id="btnPlayPause">
+            <i class="bi bi-play-fill" id="playPauseIcon"></i>
+          </div>
+
+          <div class="control-btn nav-arrow-icon" id="btnNext">
+            <i class="bi bi-chevron-right"></i>
+          </div>
+        </div>
+
+        <div class="vid-counter">
+          <span id="currentVidIdx">1</span> / <span id="totalVidCount">1</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
+<input type="hidden" id="rawScreenshots" th:value="${product.screenshots}">
+<input type="hidden" id="rawMovies" th:value="${product.movies}">
+
 <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script>
+  // 数据解析工具
+  function parsePythonList(str) {
+      if (!str || str === '[]') return [];
+      try {
+          let jsonStr = str.replace(/'/g, '"');
+          return JSON.parse(jsonStr);
+      } catch (e) { console.error("Parse Error:", e); return []; }
+  }
+
+  // 全局变量
+  let movieUrls = [];
+  let currentIdx = 0;
+  const videoWrapper = document.getElementById('videoWrapper');
+  const videoPlayer = document.getElementById('mainVideoPlayer');
+  const btnPlayPause = document.getElementById('btnPlayPause');
+  const playPauseIcon = document.getElementById('playPauseIcon');
+  const counterCurrent = document.getElementById('currentVidIdx');
+  const counterTotal = document.getElementById('totalVidCount');
+
+  // 核心功能：切换播放/暂停状态
+  function togglePlayPause() {
+      if (videoPlayer.paused || videoPlayer.ended) {
+          videoPlayer.play();
+      } else {
+          videoPlayer.pause();
+      }
+  }
+
+  // 核心功能：更新 UI 状态 (根据视频实际状态)
+  function updatePlayPauseUI() {
+      if (videoPlayer.paused || videoPlayer.ended) {
+          playPauseIcon.className = 'bi bi-play-fill'; // 显示播放图标
+          videoWrapper.classList.remove('playing');    // 移除播放中样式，显示控件
+      } else {
+          playPauseIcon.className = 'bi bi-pause-fill';// 显示暂停图标
+          videoWrapper.classList.add('playing');       // 添加播放中样式，隐藏控件
+      }
+  }
+
+  // 切换视频函数
+  function loadVideo(index) {
+      if (movieUrls.length === 0) return;
+      // 索引循环逻辑
+      if (index < 0) index = movieUrls.length - 1;
+      if (index >= movieUrls.length) index = 0;
+
+      currentIdx = index;
+
+      // 切换视频源并重置状态
+      videoPlayer.src = movieUrls[currentIdx];
+      videoPlayer.load();
+      // 切换后默认暂停，更新UI显示播放按钮
+      updatePlayPauseUI();
+
+      // 更新计数器
+      counterCurrent.innerText = currentIdx + 1;
+  }
+
+  // 初始化页面
+  document.addEventListener("DOMContentLoaded", function() {
+      const rawScreenshots = document.getElementById('rawScreenshots').value;
+      const rawMovies = document.getElementById('rawMovies').value;
+      const screenshots = parsePythonList(rawScreenshots);
+      movieUrls = parsePythonList(rawMovies);
+
+      // 初始化截图
+      if (screenshots.length > 0) {
+          document.getElementById('screenshotSection').style.display = 'block';
+          const container = document.getElementById('screenshotContainer');
+          screenshots.slice(0, 12).forEach(url => {
+              const div = document.createElement('div');
+              div.className = 'screenshot-card';
+              div.innerHTML = `<img src="${url}" loading="lazy" onclick="window.open('${url}','_blank')">`;
+              container.appendChild(div);
+          });
+      }
+
+      // 初始化视频控制逻辑
+      if (movieUrls.length > 0) {
+          document.getElementById('videoSection').style.display = 'block';
+          counterTotal.innerText = movieUrls.length;
+
+          // 1. 绑定中间播放按钮点击事件
+          btnPlayPause.addEventListener('click', togglePlayPause);
+          // 绑定点击视频画面本身也能切换播放暂停
+          videoPlayer.addEventListener('click', togglePlayPause);
+
+          // 2. 监听视频原生事件，同步 UI 状态
+          videoPlayer.addEventListener('play', updatePlayPauseUI);
+          videoPlayer.addEventListener('pause', updatePlayPauseUI);
+          videoPlayer.addEventListener('ended', updatePlayPauseUI);
+
+          // 3. 绑定左右切换事件
+          if (movieUrls.length > 1) {
+              document.getElementById('btnPrev').addEventListener('click', (e) => {
+                  e.stopPropagation(); // 防止冒泡触发视频点击
+                  loadVideo(currentIdx - 1);
+              });
+              document.getElementById('btnNext').addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  loadVideo(currentIdx + 1);
+              });
+          } else {
+              // 只有一个视频时隐藏左右箭头
+              document.getElementById('btnPrev').style.display = 'none';
+              document.getElementById('btnNext').style.display = 'none';
+          }
+
+          // 加载第一个视频
+          loadVideo(0);
+      }
+  });
+</script>
 </body>
 </html>

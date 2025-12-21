@@ -35,6 +35,15 @@ public class Product {
     // 对应 release_date
     private LocalDate releaseDate;
 
+    // === 新增字段 (对应 CSV 中的 peak_ccu 和 num_reviews_total) ===
+    private Integer peakCcu;        // 峰值在线人数
+    private Integer numReviewsTotal; // 总评论数
+    private String supportedLanguages; // 支持语言 (supported_languages)
+
+    private String detailedDescription; // detailed_description
+    private String screenshots;         // screenshots (存的是字符串格式的数组)
+    private String movies;              // movies (存的是字符串格式的数组)
+
     // === 业务保留字段 ===
     private Integer stock;
     private Integer status;
@@ -71,6 +80,25 @@ public class Product {
 
     public LocalDate getReleaseDate() { return releaseDate; }
     public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
+
+    public Integer getPeakCcu() { return peakCcu; }
+    public void setPeakCcu(Integer peakCcu) { this.peakCcu = peakCcu; }
+
+    public Integer getNumReviewsTotal() { return numReviewsTotal; }
+    public void setNumReviewsTotal(Integer numReviewsTotal) { this.numReviewsTotal = numReviewsTotal; }
+
+    public String getSupportedLanguages() { return supportedLanguages; }
+    public void setSupportedLanguages(String supportedLanguages) { this.supportedLanguages = supportedLanguages; }
+
+    public String getDetailedDescription() { return detailedDescription; }
+    public void setDetailedDescription(String detailedDescription) { this.detailedDescription = detailedDescription; }
+
+    public String getScreenshots() { return screenshots; }
+    public void setScreenshots(String screenshots) { this.screenshots = screenshots; }
+
+    public String getMovies() { return movies; }
+    public void setMovies(String movies) { this.movies = movies; }
+
 
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }

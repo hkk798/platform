@@ -17,16 +17,16 @@ public class ProductController {
     @Autowired
     private ProductService productService; // 改用 Service，不再直接调 Mapper
 
-    // === 1. 首页：展示所有商品 + 推荐商品 ===
+    // === 1. 首页：展示 Top 10 CCU 和 Top 10 Reviews ===
     @GetMapping("/")
     public String index(Model model) {
-        // 获取主列表
-        List<Product> products = productService.getHomepageProducts();
-        model.addAttribute("products", products);
+        // 1. 获取在线人数(CCU)最高的 10 个游戏
+        List<Product> topCcuList = productService.getTopCcuProducts();
+        model.addAttribute("topCcuList", topCcuList);
 
-        // 获取推荐列表 (实现报告中的“首页推荐”)
-        List<Product> recommended = productService.getRecommendedProducts();
-        model.addAttribute("recommended", recommended);
+        // 2. 获取评论数最多的 10 个游戏
+        List<Product> topReviewList = productService.getMostReviewedProducts();
+        model.addAttribute("topReviewList", topReviewList);
 
         return "index";
     }
