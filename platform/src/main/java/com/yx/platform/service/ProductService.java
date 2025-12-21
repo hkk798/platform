@@ -19,10 +19,9 @@ public interface ProductService {
      * 搜索与筛选商品
      * (对应报告：智能筛选、搜索)
      * @param keyword 关键词
-     * @param platform 平台 (PS5/Switch/Xbox)
-     * @param genre 类型 (RPG/ACT)
+     * @param genres 类型 (RPG/ACT)
      */
-    List<Product> searchAndFilter(String keyword, String platform, String genre);
+    List<Product> searchAndFilter(String keyword,  List<String> genres);
 
     /**
      * 获取推荐商品 (例如：最新上架的前4个)

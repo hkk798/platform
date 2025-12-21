@@ -10,7 +10,6 @@
         .card:hover { transform: translateY(-5px); border-color: #0d6efd; }
         .navbar { background-color: #000 !important; border-bottom: 1px solid #333; }
         .section-title { border-left: 5px solid #ffc107; padding-left: 15px; margin-bottom: 20px; color: white; }
-        /* 新增：筛选框样式 */
         .filter-box { background-color: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #333; }
     </style>
 </head>
@@ -19,9 +18,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark mb-4">
     <div class="container-fluid">
         <a class="navbar-brand text-warning fw-bold" href="/">🏆 游光阁排行榜</a>
-
         <a href="/search" class="btn btn-outline-info ms-3 me-auto">🎮 更多游戏 / 筛选</a>
-
         <div class="d-flex align-items-center">
             <div th:if="${session.currentUser == null}">
                 <a href="/login" class="btn btn-outline-secondary me-2">登录</a>
@@ -44,40 +41,52 @@
 
     <div th:if="${products != null}" class="filter-box">
         <form action="/search" method="get" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" name="keyword" class="form-control bg-dark text-white border-secondary" placeholder="🔍 搜索游戏名 (支持模糊匹配)..." th:value="${keyword}">
+            </div>
+
             <div class="col-md-4">
-                <input type="text" name="keyword" class="form-control bg-dark text-white border-secondary" placeholder="🔍 搜索游戏名..." th:value="${keyword}">
+                <div class="bg-dark border-secondary p-2 rounded d-flex flex-wrap gap-3" style="border: 1px solid #6c757d;">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" value="Action" id="checkAction"
+                               th:checked="${selectedGenres != null and #lists.contains(selectedGenres, 'Action')}">
+                        <label class="form-check-label text-white" for="checkAction">动作</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" value="RPG" id="checkRPG"
+                               th:checked="${selectedGenres != null and #lists.contains(selectedGenres, 'RPG')}">
+                        <label class="form-check-label text-white" for="checkRPG">RPG</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" value="Strategy" id="checkStrategy"
+                               th:checked="${selectedGenres != null and #lists.contains(selectedGenres, 'Strategy')}">
+                        <label class="form-check-label text-white" for="checkStrategy">策略</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" value="Adventure" id="checkAdventure"
+                               th:checked="${selectedGenres != null and #lists.contains(selectedGenres, 'Adventure')}">
+                        <label class="form-check-label text-white" for="checkAdventure">冒险</label>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3">
-                <select name="platform" class="form-select bg-dark text-white border-secondary">
-                    <option value="" th:selected="${platform == null}">🎮 所有平台</option>
-                    <option value="Windows" th:selected="${platform == 'Windows'}">Windows</option>
-                    <option value="Mac" th:selected="${platform == 'Mac'}">Mac</option>
-                    <option value="Linux" th:selected="${platform == 'Linux'}">Linux</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select name="genre" class="form-select bg-dark text-white border-secondary">
-                    <option value="" th:selected="${genre == null}">🏷️ 所有类型</option>
-                    <option value="Action" th:selected="${genre == 'Action'}">动作 (Action)</option>
-                    <option value="RPG" th:selected="${genre == 'RPG'}">角色扮演 (RPG)</option>
-                    <option value="Strategy" th:selected="${genre == 'Strategy'}">策略 (Strategy)</option>
-                    <option value="Adventure" th:selected="${genre == 'Adventure'}">冒险 (Adventure)</option>
-                </select>
-            </div>
+
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">筛选</button>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-grow-1">筛选</button>
+                    <a href="/" class="btn btn-outline-secondary" title="返回首页">🏠 首页</a>
+                </div>
             </div>
         </form>
     </div>
 
     <div th:if="${products != null}">
-        <h3 class="section-title">🔍 游戏库清单</h3>
+        <h3 class="section-title">🔍 搜索结果</h3>
         <div th:if="${products.isEmpty()}" class="alert alert-secondary text-center">
             没有找到符合条件的游戏。
         </div>
 
         <div class="row row-cols-1 row-cols-md-5 g-4 mb-5">
-            <div class="col" th:each="prod : ${products}">
+            <div class="col" th:each="prod : ${products}" th:if="${prod != null}">
                 <div th:replace="~{:: productCard(${prod})}"></div>
             </div>
         </div>
@@ -124,9 +133,16 @@
 
 <div th:fragment="productCard(prod)" class="card h-100">
     <img th:if="${prod != null}" th:src="${prod.headerImage}" class="card-img-top" style="height: 120px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x150?text=No+Image'">
-    <div class="card-body p-2">
+    <div class="card-body p-2" th:if="${prod != null}">
         <h6 class="card-title text-truncate text-white" th:text="${prod.name}">Name</h6>
-        <p class="text-warning small mb-1">￥<span th:text="${prod.price}">0</span></p>
+        <p class="text-warning small mb-1">
+            <span th:if="${prod.price == 0}">免费</span>
+
+            <span th:if="${prod.price > 0}">
+                ￥<span th:text="${prod.price}">0</span>
+            </span>
+        </p>
+
         <a th:href="@{'/product/' + ${prod.productId}}" class="btn btn-sm btn-primary w-100 stretched-link">查看</a>
     </div>
 </div>

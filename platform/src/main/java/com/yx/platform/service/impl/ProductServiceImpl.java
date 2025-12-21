@@ -22,15 +22,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> searchAndFilter(String keyword, String platform, String genre) {
-        // 业务逻辑判断：优先搜索，其次筛选，最后查所有
-        if (keyword != null && !keyword.isEmpty()) {
-            return productMapper.searchByName(keyword);
-        } else if ((platform != null && !platform.isEmpty()) || (genre != null && !genre.isEmpty())) {
-            return productMapper.filter(platform, genre);
-        } else {
-            return productMapper.findAll();
-        }
+    public List<Product> searchAndFilter(String keyword, List<String> genres) {
+        // 直接透传列表给 Mapper
+        return productMapper.Filter(keyword, genres);
     }
 
 

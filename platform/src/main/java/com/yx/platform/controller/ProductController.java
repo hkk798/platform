@@ -36,11 +36,11 @@ public class ProductController {
     public String search(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String platform,
-            @RequestParam(required = false) String genre,
+            @RequestParam(required = false) List<String> genre,
             Model model) {
 
         // 调用业务层处理复杂的搜索筛选逻辑
-        List<Product> products = productService.searchAndFilter(keyword, platform, genre);
+        List<Product> products = productService.searchAndFilter(keyword , genre);
 
         model.addAttribute("products", products);
 
