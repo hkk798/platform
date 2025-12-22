@@ -37,20 +37,24 @@ public class CartService {
     }
 
     // 添加商品到购物车
-    public void addToCart(Long userId, Long productId, int quantity) {
+    public void addToCart(Long userId, Long productId) {
+        // 1. 先检查是否已购买 (防止重复买)
+        if (orderMapper.countUserPurchased(userId, productId) > 0) {
+            // 如果为了用户体验好，这里可以不报错，直接返回
+            return;
+        }
+
         Long cartId = getOrCreateCartId(userId);
         Long itemId = cartMapper.findItemId(cartId, productId);
 
+        // 2. 检查购物车里是否已经有了
         if (itemId != null) {
-            // 如果已经有了，就更新数量 (逻辑：先查出来当前数量，再加)
-            // 这里简化：直接设为固定值或者需要在SQL里写 quantity = quantity + ?
-            // 我们简单处理：假设前端传的是增量，暂时直接插入会报错，需要逻辑判断
-            // 简单版：直接再插入一条记录是不行的，必须更新
-            // TODO: 完善逻辑，先简化为“添加即覆盖”或“数据库层面的累加”
-            // 修正 CartMapper.addItem 为 "ON DUPLICATE KEY UPDATE" 会更好，这里用Java逻辑：
-            // 暂略，实际代码需要查询旧数量 + quantity
+            // 【修改点】如果已经在购物车里了，什么都不做（不再增加数量）
+            // 或者是 log.info("商品已在购物车");
+            return;
         } else {
-            cartMapper.addItem(cartId, productId, quantity);
+            // 【修改点】不存在则新增，强制数量为 1
+            cartMapper.addItem(cartId, productId, 1);
         }
     }
 
@@ -60,12 +64,15 @@ public class CartService {
         return cartMapper.findCartItems(cartId);
     }
 
-    // 计算总价
     public BigDecimal calculateTotal(List<CartItemVo> items) {
         BigDecimal total = BigDecimal.ZERO;
         for (CartItemVo item : items) {
-            BigDecimal subTotal = item.getPrice().multiply(new BigDecimal(item.getQuantity()));
-            total = total.add(subTotal);
+            // 防止空指针
+            if (item.getPrice() != null) {
+                // 数字游戏通常数量为1，直接累加单价即可
+                // 如果数据库里存了数量，为了稳妥也可以乘一下：item.getPrice().multiply(new BigDecimal(item.getQuantity()));
+                total = total.add(item.getPrice());
+            }
         }
         return total;
     }

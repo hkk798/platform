@@ -38,11 +38,14 @@ public class CartController {
 
     // 2. 添加商品到购物车
     @PostMapping("/cart/add")
-    public String addToCart(Long productId, int quantity, HttpSession session) {
+    // 【修改点】去掉 int quantity 参数，或者保留但不用它
+    public String addToCart(Long productId, HttpSession session) {
         Long userId = getUserId(session);
         if (userId == null) return "redirect:/login";
 
-        cartService.addToCart(userId, productId, quantity);
+        // 调用 Service 时也不传 quantity，默认内部处理为 1
+        cartService.addToCart(userId, productId);
+
         return "redirect:/cart";
     }
 

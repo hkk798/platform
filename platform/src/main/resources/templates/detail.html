@@ -101,14 +101,24 @@
             <span th:if="${product.price > 0}">￥<span th:text="${product.price}">0.00</span></span>
           </div>
         </div>
-        <form action="/cart/add" method="post" class="d-grid gap-2">
+
+        <div th:if="${isOwned}" class="d-grid">
+          <button class="btn btn-secondary fw-bold px-4" disabled>
+            <i class="bi bi-check-circle-fill"></i> 您已拥有此游戏
+          </button>
+          <a href="/library" class="btn btn-outline-info btn-sm mt-2">前往库中查看 (示例链接)</a>
+        </div>
+
+        <form th:if="${!isOwned}" action="/cart/add" method="post" class="d-grid gap-2">
           <input type="hidden" name="productId" th:value="${product.productId}">
-          <div class="input-group">
-            <span class="input-group-text bg-dark text-secondary border-secondary">数量</span>
-            <input type="number" name="quantity" class="form-control bg-dark text-white border-secondary text-center" value="1" min="1" th:max="${product.stock}">
-            <button type="submit" class="btn btn-success fw-bold px-4" th:disabled="${product.stock <= 0}">加入购物车</button>
-          </div>
+
+          <input type="hidden" name="quantity" value="1">
+
+          <button type="submit" class="btn btn-success fw-bold px-4"
+                  th:disabled="${product.stock <= 0}"> 加入购物车
+          </button>
         </form>
+
       </div>
     </div>
   </div>

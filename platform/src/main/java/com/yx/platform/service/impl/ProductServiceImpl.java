@@ -2,9 +2,11 @@ package com.yx.platform.service.impl;
 
 import com.yx.platform.entity.Product;
 import com.yx.platform.mapper.ProductMapper;
+import com.yx.platform.mapper.OrderMapper;
 import com.yx.platform.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDate; // 别忘了导入这个
 import java.util.List;
@@ -14,6 +16,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductMapper productMapper;
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public List<Product> getHomepageProducts() {
@@ -59,5 +63,15 @@ public class ProductServiceImpl implements ProductService {
         int rows = productMapper.reduceStock(productId, quantity);
         // 如果影响行数 > 0，说明购买成功
         return rows > 0;
+    }
+
+    // === 【新增】实现检查逻辑 ===
+    @Override
+    public boolean checkOwnership(Long userId, Long productId) {
+        if (userId == null || productId == null) {
+            return false;
+        }
+        // 如果查询到的数量大于 0，说明买过
+        return orderMapper.countUserPurchased(userId, productId) > 0;
     }
 }

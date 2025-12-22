@@ -20,8 +20,7 @@ public interface CartMapper {
     @Insert("INSERT INTO cart_item(cart_id, product_id, quantity) VALUES(#{cartId}, #{productId}, #{quantity})")
     void addItem(@Param("cartId") Long cartId, @Param("productId") Long productId, @Param("quantity") int quantity);
 
-    @Update("UPDATE cart_item SET quantity = #{quantity} WHERE item_id = #{itemId}")
-    void updateQuantity(@Param("itemId") Long itemId, @Param("quantity") int quantity);
+
 
     // === ⚠️重点修改在这里 ===
     // 将 LEFT JOIN product 改为 LEFT JOIN product1

@@ -52,16 +52,24 @@ public class ProductController {
         return "index";
     }
 
-    // ... 详情页和购买接口也可以改为调用 productService ...
+    // === 修改 product/{id} 方法 ===
     @GetMapping("/product/{id}")
-    public String detail(@PathVariable Long id, Model model) {
-        // 1. 调用 Service 查出商品
+    public String detail(@PathVariable Long id, Model model, HttpSession session) { // 增加 HttpSession 参数
+        // 1. 查商品详情
         Product product = productService.getProductDetail(id);
-
-        // 2. 放入 Model 给页面用
         model.addAttribute("product", product);
 
-        // 3. 跳转到 detail.html
+        // 2. 【新增】检查用户是否已拥有
+        boolean isOwned = false;
+        SysUser currentUser = (SysUser) session.getAttribute("currentUser");
+
+        if (currentUser != null) {
+            isOwned = productService.checkOwnership(currentUser.getId(), id);
+        }
+
+        // 3. 将状态传给前端
+        model.addAttribute("isOwned", isOwned);
+
         return "detail";
     }
 
@@ -81,5 +89,8 @@ public class ProductController {
             return "redirect:/product/" + productId;
         }
     }
+
+
+
 
 }

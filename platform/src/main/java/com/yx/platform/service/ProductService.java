@@ -45,4 +45,10 @@ public interface ProductService {
      */
     boolean buyProduct(Long productId, int quantity);
 
+
+
+    /**
+     * 检查用户是否已拥有该游戏
+     */
+    boolean checkOwnership(Long userId, Long productId);
 }

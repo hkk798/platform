@@ -40,24 +40,14 @@
       </thead>
       <tbody>
       <tr th:each="item : ${cartItems}">
-        <td>
-          <img th:src="${item.platform}" class="cart-img" alt="封面" onerror="this.style.display='none'">
-        </td>
-        <td>
-          <h6 class="mb-0 text-info" th:text="${item.productName}">游戏名</h6>
-          <small class="text-muted">Digital Key</small>
-        </td>
         <td>￥<span th:text="${item.price}">299</span></td>
+
+        <td class="text-center">1</td>
+
+        <td class="text-warning fw-bold">￥<span th:text="${item.price}">299</span></td>
+
         <td>
-          <div class="d-flex align-items-center gap-2">
-            <a th:href="@{'/cart/update?id='+${item.cartItemId}+'&action=dec'}" class="btn btn-quantity text-decoration-none text-center">-</a>
-            <span th:text="${item.quantity}">1</span>
-            <a th:href="@{'/cart/update?id='+${item.cartItemId}+'&action=inc'}" class="btn btn-quantity text-decoration-none text-center">+</a>
-          </div>
-        </td>
-        <td class="text-warning fw-bold">￥<span th:text="${item.price * item.quantity}">299</span></td>
-        <td>
-          <a th:href="@{'/cart/remove?id='+${item.cartItemId}}" class="btn btn-sm btn-outline-danger">删除</a>
+          <a th:href="@{'/cart/remove?id='+${item.cartItemId}}" class="btn btn-sm btn-outline-danger">移除</a>
         </td>
       </tr>
       </tbody>
