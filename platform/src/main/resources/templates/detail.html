@@ -167,20 +167,18 @@
 
 </div>
 
-<input type="hidden" id="rawScreenshots" th:value="${product.screenshots}">
-<input type="hidden" id="rawMovies" th:value="${product.movies}">
-
 <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
-<script>
-  function parsePythonList(str) {
-      if (!str || str === '[]') return [];
-      try {
-          let jsonStr = str.replace(/'/g, '"');
-          return JSON.parse(jsonStr);
-      } catch (e) { console.error("Parse Error:", e); return []; }
-  }
 
-  let movieUrls = [];
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  // 1. Thymeleaf 在服务端就把 List 转换成了标准的 JSON 数组
+  // 我们直接调用刚才在 Product.java 里写好的 getScreenshotList() 方法
+  const screenshots = [[${product.screenshotList}]];
+  const movieUrls = [[${product.movieList}]];
+  /*]]>*/
+
+  // ❌ 以前的 parsePythonList 函数已删除，不再需要前端处理脏数据
+
   let currentIdx = 0;
   const videoPlayer = document.getElementById('mainVideoPlayer');
   const counterCurrent = document.getElementById('currentVidIdx');
@@ -189,24 +187,24 @@
   const btnNext = document.getElementById('btnNext');
 
   function loadVideo(index) {
-      if (movieUrls.length === 0) return;
+      if (!movieUrls || movieUrls.length === 0) return;
       if (index < 0) index = movieUrls.length - 1;
       if (index >= movieUrls.length) index = 0;
       currentIdx = index;
       videoPlayer.src = movieUrls[currentIdx];
       videoPlayer.load();
-      counterCurrent.innerText = currentIdx + 1;
+      if(counterCurrent) counterCurrent.innerText = currentIdx + 1;
   }
 
   document.addEventListener("DOMContentLoaded", function() {
-      const rawScreenshots = document.getElementById('rawScreenshots').value;
-      const rawMovies = document.getElementById('rawMovies').value;
-      const screenshots = parsePythonList(rawScreenshots);
-      movieUrls = parsePythonList(rawMovies);
+      // 2. 这里的逻辑没变，只是数据源变干净了
 
-      if (screenshots.length > 0) {
-          document.getElementById('screenshotSection').style.display = 'block';
+      if (screenshots && screenshots.length > 0) {
+          const section = document.getElementById('screenshotSection');
+          if(section) section.style.display = 'block';
+
           const container = document.getElementById('screenshotContainer');
+          // 取前 12 张
           screenshots.slice(0, 12).forEach(url => {
               const div = document.createElement('div');
               div.className = 'screenshot-card';
@@ -215,15 +213,17 @@
           });
       }
 
-      if (movieUrls.length > 0) {
-          document.getElementById('videoSection').style.display = 'block';
-          counterTotal.innerText = movieUrls.length;
+      if (movieUrls && movieUrls.length > 0) {
+          const section = document.getElementById('videoSection');
+          if(section) section.style.display = 'block';
+
+          if(counterTotal) counterTotal.innerText = movieUrls.length;
           if (movieUrls.length > 1) {
-              btnPrev.addEventListener('click', () => { loadVideo(currentIdx - 1); });
-              btnNext.addEventListener('click', () => { loadVideo(currentIdx + 1); });
+              if(btnPrev) btnPrev.addEventListener('click', () => { loadVideo(currentIdx - 1); });
+              if(btnNext) btnNext.addEventListener('click', () => { loadVideo(currentIdx + 1); });
           } else {
-              btnPrev.classList.add('hidden');
-              btnNext.classList.add('hidden');
+              if(btnPrev) btnPrev.classList.add('hidden');
+              if(btnNext) btnNext.classList.add('hidden');
           }
           loadVideo(0);
       }

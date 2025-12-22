@@ -2,6 +2,8 @@ package com.yx.platform.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 商品实体类 (已适配 Steam Dataset 字段)
@@ -50,7 +52,6 @@ public class Product {
     private Long sellerId;
 
     // ================= Getter & Setter =================
-    // 为了兼容旧代码的 getId() 调用，我们可以手动加一个 getProductId 方法
     public Long getProductId() { return appId; }
     public void setProductId(Long id) { this.appId = id; }
 
@@ -99,7 +100,6 @@ public class Product {
     public String getMovies() { return movies; }
     public void setMovies(String movies) { this.movies = movies; }
 
-
     public Integer getStock() { return stock; }
     public void setStock(Integer stock) { this.stock = stock; }
 
@@ -108,4 +108,60 @@ public class Product {
 
     public Long getSellerId() { return sellerId; }
     public void setSellerId(Long sellerId) { this.sellerId = sellerId; }
+
+    // =========================================================
+    // 👇👇👇 新增的辅助方法 (核心修改) 👇👇👇
+    // =========================================================
+
+    /**
+     * 前端通过 ${product.screenshotList} 调用
+     * 自动将 "['url1', 'url2']" 转为 List<String>
+     */
+    public List<String> getScreenshotList() {
+        return parsePythonString(this.screenshots);
+    }
+
+    /**
+     * 前端通过 ${product.movieList} 调用
+     */
+    public List<String> getMovieList() {
+        return parsePythonString(this.movies);
+    }
+
+    /**
+     * 解析 Python 风格的列表字符串，清洗脏数据
+     */
+    private List<String> parsePythonString(String str) {
+        if (str == null || str.length() <= 2) {
+            return new ArrayList<>();
+        }
+        try {
+            // 1. 去掉首尾的 [ ]
+            String clean = str.substring(1, str.length() - 1);
+
+            // 2. 按逗号分割
+            // 注意：这里简单的 split(",") 能应付绝大多数 Steam 数据集的情况
+            String[] parts = clean.split(",");
+
+            List<String> list = new ArrayList<>();
+            for (String part : parts) {
+                // 3. 去掉前后的空格
+                part = part.trim();
+                // 4. 去掉前后的单引号 ' 或双引号 "
+                if (part.startsWith("'") && part.endsWith("'")) {
+                    part = part.substring(1, part.length() - 1);
+                } else if (part.startsWith("\"") && part.endsWith("\"")) {
+                    part = part.substring(1, part.length() - 1);
+                }
+
+                if (!part.isEmpty()) {
+                    list.add(part);
+                }
+            }
+            return list;
+        } catch (Exception e) {
+            // 解析失败返回空列表，防止页面报错
+            return new ArrayList<>();
+        }
+    }
 }
