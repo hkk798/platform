@@ -24,11 +24,10 @@ public interface CartMapper {
 
     // === ⚠️重点修改在这里 ===
     // 将 LEFT JOIN product 改为 LEFT JOIN product1
-    // 同时确认 ON 后面的关联字段是 p.app_id 还是 p.appid
     @Select("SELECT ci.item_id as cartItemId, ci.product_id as productId, ci.quantity, " +
             "p.name as productName, p.price, p.header_image as platform " +
             "FROM cart_item ci " +
-            "LEFT JOIN product1 p ON ci.product_id = p.app_id " +
+            "LEFT JOIN product1 p ON ci.product_id = p.appid " +
             "WHERE ci.cart_id = #{cartId}")
     List<CartItemVo> findCartItems(Long cartId);
 

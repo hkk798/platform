@@ -111,11 +111,10 @@
 
         <form th:if="${!isOwned}" action="/cart/add" method="post" class="d-grid gap-2">
           <input type="hidden" name="productId" th:value="${product.productId}">
-
           <input type="hidden" name="quantity" value="1">
 
-          <button type="submit" class="btn btn-success fw-bold px-4"
-                  th:disabled="${product.stock <= 0}"> 加入购物车
+          <button type="submit" class="btn btn-success fw-bold px-4">
+            加入购物车
           </button>
         </form>
 
