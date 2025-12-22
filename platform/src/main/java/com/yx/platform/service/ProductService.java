@@ -43,7 +43,7 @@ public interface ProductService {
     /**
      * 购买商品（扣减库存）
      */
-    boolean buyProduct(Long productId, int quantity);
+    boolean buyProduct(Long userId, Long productId, int quantity);
 
 
 

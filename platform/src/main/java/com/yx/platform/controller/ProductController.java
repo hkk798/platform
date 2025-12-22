@@ -75,17 +75,25 @@ public class ProductController {
 
     // === 4. 购买商品接口 ===
     // 对应 detail.html 里的表单提交：action="/product/buy"
+// === 修改后的购买接口 ===
     @PostMapping("/product/buy")
-    public String buy(@RequestParam Long productId, @RequestParam int quantity) {
-        // 调用业务层执行购买（扣库存）
-        boolean success = productService.buyProduct(productId, quantity);
+    public String buy(@RequestParam Long productId, @RequestParam int quantity, HttpSession session) {
+        // 1. 获取当前登录用户
+        SysUser currentUser = (SysUser) session.getAttribute("currentUser");
+
+        // 如果未登录，跳转登录页
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // 2. 调用 Service 执行购买，传入 userId
+        boolean success = productService.buyProduct(currentUser.getId(), productId, quantity);
 
         if (success) {
-            // 购买成功，重定向回首页（或者去订单页，如果以后做的话）
+            // 购买成功回到首页
             return "redirect:/";
         } else {
-            // 购买失败（比如库存不够），重定向回详情页，或者报错
-            // 这里简单处理：跳回详情页
+            // 失败回到详情页
             return "redirect:/product/" + productId;
         }
     }
