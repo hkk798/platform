@@ -2,6 +2,7 @@ package com.yx.platform.service;
 
 import com.yx.platform.entity.Product;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品业务逻辑接口
@@ -21,7 +22,7 @@ public interface ProductService {
      * @param keyword 关键词
      * @param genres 类型 (RPG/ACT)
      */
-    List<Product> searchAndFilter(String keyword,  List<String> genres);
+    Map<String, Object> searchAndFilter(String keyword, List<String> genres, int pageNum, int pageSize);
 
     /**
      * 获取推荐商品 (例如：最新上架的前4个)

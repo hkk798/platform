@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>我的游戏库 - 游光阁</title>
+  <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+  <style>
+    body { background-color: #121212; color: #e0e0e0; }
+    .card { background-color: #1e1e1e; border: 1px solid #333; transition: transform 0.2s; }
+    .card:hover { transform: translateY(-5px); border-color: #28a745; } /* 已拥有变成绿色边框 */
+    .navbar { background-color: #000 !important; border-bottom: 1px solid #333; }
+    .section-title { border-left: 5px solid #28a745; padding-left: 15px; margin-bottom: 20px; color: white; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand text-warning fw-bold" href="/">🏆 游光阁</a>
+    <div class="d-flex align-items-center ms-auto">
+      <a href="/" class="btn btn-outline-secondary me-3">返回首页</a>
+      <div class="dropdown">
+        <button class="btn btn-dark border-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          👤 <span th:text="${session.currentUser.username}">User</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+          <li><a class="dropdown-item" href="/my-games">🎮 我的库</a></li>
+          <li><a class="dropdown-item" href="/password">🔒 修改密码</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <h3 class="section-title">🎮 我的游戏库</h3>
+
+  <div th:if="${products == null or products.isEmpty()}" class="alert alert-secondary text-center mt-5">
+    <h4>你的库空空如也...</h4>
+    <p>快去 <a href="/" class="text-warning">商店首页</a> 挑选心仪的游戏吧！</p>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-5 g-4">
+    <div class="col" th:each="prod : ${products}">
+      <div class="card h-100">
+        <img th:src="${prod.headerImage}" class="card-img-top" style="height: 120px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x150'">
+        <div class="card-body p-2">
+          <h6 class="card-title text-truncate text-white" th:text="${prod.name}">Name</h6>
+          <div class="d-grid gap-2 mt-2">
+            <button class="btn btn-sm btn-success disabled">已拥有</button>
+            <a th:href="@{'/product/' + ${prod.productId}}" class="btn btn-sm btn-outline-secondary">查看详情</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

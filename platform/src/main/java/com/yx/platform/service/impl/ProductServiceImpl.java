@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -25,9 +27,34 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.findAll();
     }
 
+    // === 核心修改：实现分页逻辑 ===
     @Override
-    public List<Product> searchAndFilter(String keyword, List<String> genres) {
-        return productMapper.Filter(keyword, genres);
+    public Map<String, Object> searchAndFilter(String keyword, List<String> genres, int pageNum, int pageSize) {
+        // 1. 简单校验页码
+        if (pageNum < 1) pageNum = 1;
+
+        // 2. 计算 Offset (数据库偏移量)
+        int offset = (pageNum - 1) * pageSize;
+
+        // 3. 查数据
+        List<Product> products = productMapper.findByPage(keyword, genres, offset, pageSize);
+
+        // 4. 查总数
+        long total = productMapper.countProducts(keyword, genres);
+
+        // 5. 算总页数
+        int totalPages = (int) Math.ceil((double) total / pageSize);
+
+        // 6. 封装
+        Map<String, Object> result = new HashMap<>();
+        result.put("products", products);
+        result.put("total", total);
+        result.put("pageNum", pageNum);
+        result.put("totalPages", totalPages);
+        result.put("hasPrevious", pageNum > 1);
+        result.put("hasNext", pageNum < totalPages);
+
+        return result;
     }
 
     @Override

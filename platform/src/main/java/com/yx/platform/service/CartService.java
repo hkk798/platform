@@ -116,7 +116,7 @@ public class CartService {
                     orderMapper.saveOrderItem(orderId, item.getProductId(), 1, item.getPrice());
                 } catch (Exception dbError) {
                     System.err.println(">>> 商品保存失败(可能是外键冲突)，忽略此错误，继续清理购物车。商品ID: " + item.getProductId());
-                    //dbError.printStackTrace();
+                    throw new RuntimeException("结算商品失败: " + item.getProductName(), dbError);
                 }
             }
 

@@ -1,6 +1,7 @@
 package com.yx.platform.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import com.yx.platform.entity.SysUser; // ⚠️确保这里导入了你刚才写的实体类
@@ -25,11 +26,11 @@ public interface UserMapper {
     @Select("SELECT * FROM sys_user WHERE username = #{username} AND password = #{password}")
     SysUser login(String username, String password);
 
-    // 修改密码
-    @Update("UPDATE sys_user SET password = #{newPassword} WHERE id = #{userId}")
-    void updatePassword(Long userId, String newPassword);
-
-    // (可选) 根据ID查用户，用于验证旧密码
+    // === 新增：根据ID查找用户（用于修改密码前验证） ===
     @Select("SELECT * FROM sys_user WHERE id = #{id}")
     SysUser findById(Long id);
+
+    // === 新增：修改密码 ===
+    @Update("UPDATE sys_user SET password = #{newPassword} WHERE id = #{userId}")
+    int updatePassword(@Param("userId") Long userId, @Param("newPassword") String newPassword);
 }

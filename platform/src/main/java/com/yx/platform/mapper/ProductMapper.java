@@ -25,27 +25,44 @@ public interface ProductMapper {
     @Select("<script>" +
             "SELECT * FROM product1 " +
             "<where>" +
-            // 1. 如果没传关键词，也没选任何标签 -> 查所有
-            "  <if test='(keyword == null or keyword == \"\") and (genres == null or genres.size() == 0)'>" +
-            "    1=1" +
+            // 1. 关键词 (如果有，必须满足)
+            "  <if test='keyword != null and keyword != \"\"'>" +
+            "    AND name LIKE CONCAT('%', #{keyword}, '%')" +
             "  </if>" +
-            // 2. 如果有关键词 或 有标签 -> 进入混合 OR 查询
-            "  <if test='(keyword != null and keyword != \"\") or (genres != null and genres.size() > 0)'>" +
-            "    AND (" +
-            "      1=0 " + // 占位符
-            "      <if test='keyword != null and keyword != \"\"'> OR name LIKE CONCAT('%', #{keyword}, '%') </if>" +
-            // 遍历标签列表
-            "      <if test='genres != null and genres.size() > 0'>" +
-            "        <foreach item='g' collection='genres'>" +
-            "          OR genres LIKE CONCAT('%', #{g}, '%') " +
-            "        </foreach>" +
-            "      </if>" +
-            "    )" +
+
+            // 2. 标签循环 (改为 AND 逻辑)
+            // 解释：遍历每一个选中的标签 g，生成 AND genres LIKE '%g%'
+            // 效果：AND genres LIKE '%Action%' AND genres LIKE '%RPG%'
+            "  <if test='genres != null and genres.size() > 0'>" +
+            "    <foreach item='g' collection='genres'>" +
+            "       AND genres LIKE CONCAT('%', #{g}, '%') " +
+            "    </foreach>" +
             "  </if>" +
             "</where>" +
-            "LIMIT 50" +
+            "LIMIT #{offset}, #{pageSize}" +
             "</script>")
-    List<Product> Filter(@Param("keyword") String keyword, @Param("genres") List<String> genres);
+    List<Product> findByPage(@Param("keyword") String keyword,
+                             @Param("genres") List<String> genres,
+                             @Param("offset") int offset,
+                             @Param("pageSize") int pageSize);
+
+
+    // === 4. 查询总数 (保持逻辑一致) ===
+    @Select("<script>" +
+            "SELECT COUNT(*) FROM product1 " +
+            "<where>" +
+            "  <if test='keyword != null and keyword != \"\"'>" +
+            "    AND name LIKE CONCAT('%', #{keyword}, '%')" +
+            "  </if>" +
+            "  <if test='genres != null and genres.size() > 0'>" +
+            "    <foreach item='g' collection='genres'>" +
+            "       AND genres LIKE CONCAT('%', #{g}, '%') " +
+            "    </foreach>" +
+            "  </if>" +
+            "</where>" +
+            "</script>")
+    long countProducts(@Param("keyword") String keyword, @Param("genres") List<String> genres);
+
 
     // 4. 详情：改为查 product1
     // ⚠️注意：请确认您的 product1 表里的主键列名是 app_id 还是 appid
@@ -68,4 +85,11 @@ public interface ProductMapper {
     // 评论数榜单：改为查 product1
     @Select("SELECT * FROM product1 ORDER BY num_reviews_total DESC LIMIT 10")
     List<Product> findTop10ByReviews();
+
+    @Select("SELECT DISTINCT p.* FROM product1 p " +
+            "JOIN order_item oi ON p.appid = oi.product_id " +
+            "JOIN orders o ON oi.order_id = o.order_id " +
+            "WHERE o.user_id = #{userId}")
+    List<Product> findPurchasedByUserId(Long userId);
+
 }

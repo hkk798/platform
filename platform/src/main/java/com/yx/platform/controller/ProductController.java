@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ProductController {
@@ -37,17 +38,26 @@ public class ProductController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String platform,
             @RequestParam(required = false) List<String> genre,
+            @RequestParam(defaultValue = "1") int page, // 新增：页码
             Model model) {
 
-        // 调用业务层处理复杂的搜索筛选逻辑
-        List<Product> products = productService.searchAndFilter(keyword , genre);
+        int pageSize = 20; // 每页显示 20 条
 
-        model.addAttribute("products", products);
+        // 调用业务层处理复杂的搜索筛选逻辑
+        Map<String, Object> result = productService.searchAndFilter(keyword, genre, page, pageSize);
+
+        // 将结果拆包放入 Model
+        model.addAttribute("products", result.get("products"));
+        model.addAttribute("currentPage", result.get("pageNum"));
+        model.addAttribute("totalPages", result.get("totalPages"));
+        model.addAttribute("hasPrevious", result.get("hasPrevious"));
+        model.addAttribute("hasNext", result.get("hasNext"));
 
         // 回显查询条件
         model.addAttribute("keyword", keyword);
         model.addAttribute("platform", platform);
         model.addAttribute("genre", genre);
+
 
         return "index";
     }

@@ -1,12 +1,16 @@
 package com.yx.platform.controller;
 
+import com.yx.platform.entity.Product;
 import com.yx.platform.entity.SysUser;
+import com.yx.platform.mapper.ProductMapper;
 import com.yx.platform.mapper.UserMapper;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.ui.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller; // 注意这里换成了 Controller
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody; // 新增这个
 
 import java.util.List;
@@ -16,6 +20,10 @@ public class UserController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ProductMapper productMapper;
+
 
     // === 注册接口 ===
     @PostMapping("/register")
@@ -58,36 +66,64 @@ public class UserController {
         return "redirect:/login?msg=logout";
     }
 
-    // === 2. 跳转到修改密码页面 ===
-    @GetMapping("/user/password")
-    public String passwordPage(HttpSession session) {
-        // 如果没登录，先去登录
+    // === 2. 修改密码页面 ===
+    @GetMapping("/password")
+    public String passwordPage(HttpSession session, Model model) {
         if (session.getAttribute("currentUser") == null) {
             return "redirect:/login";
         }
-        return "password"; // 对应 templates/password.html
+        return "password"; // 跳转到 password.html
     }
 
-    // === 3. 执行修改密码 ===
-    @PostMapping("/user/password")
-    public String updatePassword(String oldPassword, String newPassword, HttpSession session, org.springframework.ui.Model model) {
+    // === 3. 处理修改密码逻辑 ===
+    @PostMapping("/password/update")
+    public String updatePassword(
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword,
+            @RequestParam String confirmPassword,
+            HttpSession session,
+            Model model) {
+
         SysUser currentUser = (SysUser) session.getAttribute("currentUser");
-        if (currentUser == null) return "redirect:/login";
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
 
-        // 1. 验证旧密码是否正确（为了安全，建议查库对比）
-        // 这里简单直接比对当前 session 里的或者重新查库
-        SysUser userInDb = userMapper.login(currentUser.getUsername(), oldPassword);
+        // 1. 校验两次新密码是否一致
+        if (!newPassword.equals(confirmPassword)) {
+            model.addAttribute("error", "两次输入的新密码不一致！");
+            return "password";
+        }
 
-        if (userInDb == null) {
+        // 2. 校验旧密码是否正确 (从数据库查最新数据比对)
+        SysUser userInDb = userMapper.findById(currentUser.getId());
+        if (!userInDb.getPassword().equals(oldPassword)) {
             model.addAttribute("error", "旧密码错误！");
             return "password";
         }
 
-        // 2. 更新密码
+        // 3. 执行更新
         userMapper.updatePassword(currentUser.getId(), newPassword);
 
-        // 3. 修改成功后，强制退出，让用户重新登录
-        session.invalidate();
-        return "redirect:/login?msg=passwordChanged";
+        // 4. 更新 Session 中的用户信息 或 强制登出让用户重新登录
+        session.removeAttribute("currentUser");
+        model.addAttribute("msg", "密码修改成功，请使用新密码重新登录");
+
+        return "login";
+    }
+
+
+    @GetMapping("/my-games")
+    public String myGames(HttpSession session, Model model) {
+        SysUser user = (SysUser) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // 查询该用户买过的游戏
+        List<Product> myGames = productMapper.findPurchasedByUserId(user.getId());
+        model.addAttribute("products", myGames);
+
+        return "my_games"; // 跳转到 my_games.html
     }
 }

@@ -30,6 +30,11 @@
                     👤 <span th:text="${session.currentUser.username}">User</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/my-games">🎮 我的库</a></li>
+                    <li><a class="dropdown-item" href="/password">🔒 修改密码</a></li>
+
+                    <li><hr class="dropdown-divider"></li>
+
                     <li><a class="dropdown-item" href="/logout">退出登录</a></li>
                 </ul>
             </div>
@@ -47,26 +52,55 @@
 
             <div class="col-md-4">
                 <div class="bg-dark border-secondary p-2 rounded d-flex flex-wrap gap-3" style="border: 1px solid #6c757d;">
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="genre" value="Action" id="checkAction"
-                               th:checked="${selectedGenres != null and #lists.contains(selectedGenres, 'Action')}">
+                               th:checked="${genre != null and #lists.contains(genre, 'Action')}">
                         <label class="form-check-label text-white" for="checkAction">动作</label>
                     </div>
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="genre" value="RPG" id="checkRPG"
-                               th:checked="${selectedGenres != null and #lists.contains(selectedGenres, 'RPG')}">
+                               th:checked="${genre != null and #lists.contains(genre, 'RPG')}">
                         <label class="form-check-label text-white" for="checkRPG">RPG</label>
                     </div>
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="genre" value="Strategy" id="checkStrategy"
-                               th:checked="${selectedGenres != null and #lists.contains(selectedGenres, 'Strategy')}">
+                               th:checked="${genre != null and #lists.contains(genre, 'Strategy')}">
                         <label class="form-check-label text-white" for="checkStrategy">策略</label>
                     </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" value="Indie" id="checkIndie"
+                               th:checked="${genre != null and #lists.contains(genre, 'Indie')}">
+                        <label class="form-check-label text-white" for="checkIndie">独立</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" value="Massively Multiplayer" id="checkMassivelyMultiplayer"
+                               th:checked="${genre != null and #lists.contains(genre, 'Massively Multiplayer')}">
+                        <label class="form-check-label text-white" for="checkMassivelyMultiplayer">大型多人</label>
+                    </div>
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="genre" value="Adventure" id="checkAdventure"
-                               th:checked="${selectedGenres != null and #lists.contains(selectedGenres, 'Adventure')}">
+                               th:checked="${genre != null and #lists.contains(genre, 'Adventure')}">
                         <label class="form-check-label text-white" for="checkAdventure">冒险</label>
                     </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" value="Free to Play" id="checkFreeToPlay"
+                               th:checked="${genre != null and #lists.contains(genre, 'Free to Play')}">
+                        <label class="form-check-label text-white" for="checkFreeToPlay">免费游玩</label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="genre" value="Casual" id="checkCasual"
+                               th:checked="${genre != null and #lists.contains(genre, 'Casual')}">
+                        <label class="form-check-label text-white" for="checkCasual">休闲</label>
+                    </div>
+
                 </div>
             </div>
 
@@ -90,6 +124,54 @@
                 <div th:replace="~{:: productCard(${prod})}"></div>
             </div>
         </div>
+
+        <div class="d-flex justify-content-center align-items-center mb-5" th:if="${totalPages != null and totalPages > 0}">
+
+            <nav aria-label="Page navigation" class="me-3">
+                <ul class="pagination mb-0">
+                    <li class="page-item" th:classappend="${!hasPrevious} ? 'disabled'">
+                        <a class="page-link bg-dark text-white border-secondary"
+                           th:href="@{/search(keyword=${keyword}, genre=${genre}, page=${currentPage - 1})}">
+                            &laquo; 上一页
+                        </a>
+                    </li>
+
+                    <li class="page-item disabled">
+                        <span class="page-link bg-dark text-white border-secondary">
+                             <span th:text="${currentPage}">1</span> / <span th:text="${totalPages}">1</span> 页
+                        </span>
+                    </li>
+
+                    <li class="page-item" th:classappend="${!hasNext} ? 'disabled'">
+                        <a class="page-link bg-dark text-white border-secondary"
+                           th:href="@{/search(keyword=${keyword}, genre=${genre}, page=${currentPage + 1})}">
+                            下一页 &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <form action="/search" method="get" class="d-flex align-items-center">
+
+                <input type="hidden" name="keyword" th:value="${keyword}">
+
+                <th:block th:if="${genre != null}">
+                    <th:block th:each="g : ${genre}">
+                        <input type="hidden" name="genre" th:value="${g}">
+                    </th:block>
+                </th:block>
+
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-dark text-secondary border-secondary">跳至</span>
+                    <input type="number" name="page" class="form-control bg-dark text-white border-secondary text-center"
+                           style="width: 60px;" min="1" th:max="${totalPages}" th:value="${currentPage}">
+                    <span class="input-group-text bg-dark text-secondary border-secondary">页</span>
+                    <button class="btn btn-outline-warning" type="submit">Go</button>
+                </div>
+            </form>
+
+        </div>
+
         <hr class="text-secondary">
     </div>
 
