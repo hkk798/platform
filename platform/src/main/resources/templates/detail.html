@@ -6,36 +6,61 @@
   <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <style>
-    /* === 全局深色主题 === */
-    body { background-color: #121212; color: #c7d5e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    /* === 全局亮色主题 === */
+    /* 背景改为浅灰白，文字改为深灰 */
+    body { background-color: #f8f9fa; color: #212529; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+    /* === 平滑滚动 === */
+    html { scroll-behavior: smooth; }
+
     .detail-container { max-width: 1200px; margin-top: 30px; margin-bottom: 80px; }
 
     /* === 顶部区域 === */
-    .game-cover-main { width: 100%; border-radius: 4px; box-shadow: 0 0 10px rgba(0,0,0,0.5); object-fit: cover; }
-    .game-title { color: #ffffff; font-weight: bold; font-size: 2.5rem; margin-bottom: 10px; }
-    .stats-bar { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 5px; margin-bottom: 20px; display: flex; gap: 15px; }
-    .stat-item { font-size: 0.9rem; color: #8f98a0; }
-    .stat-value { color: #66c0f4; font-weight: bold; margin-left: 5px; }
-    .dev-info { font-size: 0.9rem; color: #56606a; margin-bottom: 20px; }
-    .dev-info span { color: #66c0f4; margin-right: 15px; }
-    .buy-card { background: linear-gradient(to right, rgba(0,0,0,0.3), rgba(0,0,0,0.1)); border-radius: 5px; padding: 20px; border: 1px solid #333; position: relative; overflow: hidden; }
-    .price-tag { font-size: 1.8rem; color: #d4e157; font-weight: bold; }
+    /* 阴影稍微调淡一点 */
+    .game-cover-main { width: 100%; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: cover; }
+
+    /* 标题颜色改为深黑 */
+    .game-title { color: #212529; font-weight: bold; font-size: 2.5rem; margin-bottom: 10px; }
+
+    /* 统计栏背景改为浅灰色 */
+    .stats-bar { background: #e9ecef; padding: 10px; border-radius: 5px; margin-bottom: 20px; display: flex; gap: 15px; }
+    .stat-item { font-size: 0.9rem; color: #6c757d; }
+    .stat-value { color: #0d6efd; font-weight: bold; margin-left: 5px; } /* 蓝色高亮 */
+
+    /* 开发商信息 */
+    .dev-info { font-size: 0.9rem; color: #495057; margin-bottom: 20px; }
+    .dev-info span { color: #0d6efd; margin-right: 15px; }
+
+    /* 购买卡片：白底 + 浅灰边框 */
+    .buy-card { background: #ffffff; border-radius: 5px; padding: 20px; border: 1px solid #dee2e6; position: relative; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    /* 价格颜色改为绿色，更符合常规 */
+    .price-tag { font-size: 1.8rem; color: #198754; font-weight: bold; }
 
     /* === 分区通用样式 === */
     .section-wrapper { margin-top: 50px; }
-    .section-header { border-bottom: 1px solid #333; margin-bottom: 20px; padding-bottom: 10px; color: #fff; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
-    .section-header i { color: #66c0f4; }
-    .rich-content { color: #acb2b8; line-height: 1.8; font-size: 1rem; }
-    .rich-content img { max-width: 100%; height: auto; display: block; margin: 15px 0; border-radius: 4px; }
-    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
-    .screenshot-card img { width: 100%; border-radius: 4px; border: 1px solid #333; cursor: zoom-in; transition: transform 0.2s; }
-    .screenshot-card img:hover { transform: translateY(-5px); border-color: #66c0f4; }
 
-    /* === 视频轮播样式 === */
+    /* === 锚点定位偏移 === */
+    .section-anchor { scroll-margin-top: 80px; }
+
+    /* 分区标题：深色字 + 浅色底边 */
+    .section-header { border-bottom: 1px solid #dee2e6; margin-bottom: 20px; padding-bottom: 10px; color: #212529; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+    .section-header i { color: #0d6efd; }
+
+    /* 富文本内容：深灰字 */
+    .rich-content { color: #495057; line-height: 1.8; font-size: 1rem; }
+    .rich-content img { max-width: 100%; height: auto; display: block; margin: 15px 0; border-radius: 4px; }
+
+    /* 截图网格 */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px; }
+    /* 截图边框变浅 */
+    .screenshot-card img { width: 100%; border-radius: 4px; border: 1px solid #dee2e6; cursor: zoom-in; transition: transform 0.2s; }
+    .screenshot-card img:hover { transform: translateY(-5px); border-color: #0d6efd; }
+
+    /* === 视频轮播样式 (视频播放器内部通常保持黑色，但边框改浅) === */
     .video-carousel-wrapper {
         position: relative;
-        background: #000;
-        border: 1px solid #444;
+        background: #000; /* 视频背景保持黑色比较好 */
+        border: 1px solid #dee2e6; /* 边框变浅 */
         border-radius: 8px;
         overflow: hidden;
         aspect-ratio: 16/9;
@@ -46,16 +71,16 @@
     .video-player { width: 100%; height: 100%; object-fit: contain; z-index: 1; outline: none; }
     .side-nav-btn {
         position: absolute; top: 50%; transform: translateY(-50%); z-index: 20;
-        background: rgba(0, 0, 0, 0.4); color: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.6); color: #333; /* 按钮改为浅色半透明 */
         width: 50px; height: 80px; display: flex; align-items: center; justify-content: center;
         cursor: pointer; font-size: 2rem; transition: all 0.2s ease; border-radius: 4px; user-select: none;
     }
-    .side-nav-btn:hover { background: rgba(60, 60, 60, 0.8); color: #66c0f4; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+    .side-nav-btn:hover { background: rgba(255, 255, 255, 0.9); color: #0d6efd; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     .nav-prev { left: 10px; }
     .nav-next { right: 10px; }
     .side-nav-btn.hidden { display: none !important; }
     .vid-counter {
-        position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7);
+        position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6);
         color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.9rem;
         z-index: 20; border: 1px solid #555; pointer-events: none;
     }
@@ -63,10 +88,10 @@
 </head>
 <body>
 
-<nav class="navbar navbar-dark bg-black border-bottom border-secondary mb-4">
+<nav class="navbar navbar-light bg-white border-bottom mb-4 shadow-sm">
   <div class="container">
     <a class="navbar-brand text-warning fw-bold" href="/"> <i class="bi bi-controller"></i> 游光阁 </a>
-    <a href="/" class="btn btn-outline-secondary btn-sm">← 返回首页</a>
+    <a href="/" class="btn btn-outline-dark btn-sm">← 返回首页</a>
   </div>
 </nav>
 
@@ -74,7 +99,7 @@
 
   <div class="row">
     <div class="col-lg-8">
-      <div class="ratio ratio-16x9 bg-black rounded shadow">
+      <div class="ratio ratio-16x9 bg-light rounded shadow-sm">
         <img th:src="${product.headerImage}" class="game-cover-main" onerror="this.src='https://via.placeholder.com/800x450?text=No+Media'">
       </div>
     </div>
@@ -83,10 +108,9 @@
         <h1 class="game-title" th:text="${product.name}">游戏名称</h1>
         <div class="stats-bar">
           <div class="stat-item">在线: <span class="stat-value text-danger" th:text="${product.peakCcu ?: '-'}">0</span></div>
-          <div class="stat-item">好评: <span class="stat-value text-info" th:text="${product.numReviewsTotal ?: '-'}">0</span></div>
-          <div class="stat-item">发行: <span class="stat-value text-white" th:text="${product.releaseDate ?: '未知'}">2023</span></div>
+          <div class="stat-item">好评: <span class="stat-value text-primary" th:text="${product.numReviewsTotal ?: '-'}">0</span></div> <div class="stat-item">发行: <span class="stat-value text-dark" th:text="${product.releaseDate ?: '未知'}">2023</span></div>
         </div>
-        <p class="text-secondary mb-4" th:text="${product.shortDescription}">简介...</p>
+        <p class="text-muted mb-4" th:text="${product.shortDescription}">简介...</p>
         <div class="dev-info">
           <div>开发商: <span th:text="${product.developers}">Valve</span></div>
           <div class="mt-1">发行商: <span th:text="${product.publishers}">Valve</span></div>
@@ -95,7 +119,7 @@
       </div>
       <div class="buy-card mt-3">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-white fs-5">购买游戏</span>
+          <span class="text-dark fs-5">购买游戏</span>
           <div class="price-tag">
             <span th:if="${product.price == 0}">免费</span>
             <span th:if="${product.price > 0}">￥<span th:text="${product.price}">0.00</span></span>
@@ -106,15 +130,15 @@
           <button class="btn btn-secondary fw-bold px-4" disabled>
             <i class="bi bi-check-circle-fill"></i> 您已拥有此游戏
           </button>
-          <a href="/library" class="btn btn-outline-info btn-sm mt-2">前往库中查看 (示例链接)</a>
+          <a href="/my-games" class="btn btn-outline-info btn-sm mt-2">前往库中查看</a>
         </div>
 
-        <form th:if="${!isOwned}" action="/cart/add" method="post" class="d-grid gap-2">
+        <form th:if="${!isOwned}" action="/product/buy" method="post" class="d-grid gap-2">
           <input type="hidden" name="productId" th:value="${product.productId}">
           <input type="hidden" name="quantity" value="1">
 
           <button type="submit" class="btn btn-success fw-bold px-4">
-            加入购物车
+            立即购买
           </button>
         </form>
 
@@ -122,7 +146,22 @@
     </div>
   </div>
 
-  <div class="section-wrapper">
+  <div class="sticky-top py-2 mb-4" style="top: 0; z-index: 1020; background-color: rgba(255, 255, 255, 0.95); border-bottom: 1px solid #dee2e6; backdrop-filter: blur(5px);">
+    <div class="d-flex gap-3 justify-content-start">
+      <span class="text-muted small align-self-center me-2">快速定位:</span>
+      <a href="#aboutSection" class="btn btn-sm btn-light border text-secondary rounded-pill">
+        <i class="bi bi-file-earmark-text"></i> 关于游戏
+      </a>
+      <a href="#screenshotSection" id="nav-screenshots" class="btn btn-sm btn-light border text-secondary rounded-pill" style="display:none;">
+        <i class="bi bi-images"></i> 游戏截图
+      </a>
+      <a href="#videoSection" id="nav-videos" class="btn btn-sm btn-light border text-secondary rounded-pill" style="display:none;">
+        <i class="bi bi-film"></i> 宣传视频
+      </a>
+    </div>
+  </div>
+
+  <div class="section-wrapper section-anchor" id="aboutSection">
     <h3 class="section-header"><i class="bi bi-file-earmark-text"></i> 关于这款游戏</h3>
     <div class="row">
       <div class="col-12">
@@ -133,14 +172,14 @@
     </div>
   </div>
 
-  <div class="section-wrapper" id="screenshotSection" style="display: none;">
+  <div class="section-wrapper section-anchor" id="screenshotSection" style="display: none;">
     <h3 class="section-header"><i class="bi bi-images"></i> 游戏截图</h3>
     <div class="col-12">
       <div id="screenshotContainer" class="gallery-grid"></div>
     </div>
   </div>
 
-  <div class="section-wrapper" id="videoSection" style="display: none;">
+  <div class="section-wrapper section-anchor" id="videoSection" style="display: none;">
     <h3 class="section-header"><i class="bi bi-film"></i> 宣传视频库</h3>
     <div class="col-12">
 
@@ -171,13 +210,9 @@
 
 <script th:inline="javascript">
   /*<![CDATA[*/
-  // 1. Thymeleaf 在服务端就把 List 转换成了标准的 JSON 数组
-  // 我们直接调用刚才在 Product.java 里写好的 getScreenshotList() 方法
   const screenshots = [[${product.screenshotList}]];
   const movieUrls = [[${product.movieList}]];
   /*]]>*/
-
-  // ❌ 以前的 parsePythonList 函数已删除，不再需要前端处理脏数据
 
   let currentIdx = 0;
   const videoPlayer = document.getElementById('mainVideoPlayer');
@@ -197,11 +232,14 @@
   }
 
   document.addEventListener("DOMContentLoaded", function() {
-      // 2. 这里的逻辑没变，只是数据源变干净了
-
+      // 1. 处理截图
       if (screenshots && screenshots.length > 0) {
           const section = document.getElementById('screenshotSection');
           if(section) section.style.display = 'block';
+
+          // 👇 显示对应的导航按钮
+          const navBtn = document.getElementById('nav-screenshots');
+          if(navBtn) navBtn.style.display = 'inline-block';
 
           const container = document.getElementById('screenshotContainer');
           // 取前 12 张
@@ -213,9 +251,14 @@
           });
       }
 
+      // 2. 处理视频
       if (movieUrls && movieUrls.length > 0) {
           const section = document.getElementById('videoSection');
           if(section) section.style.display = 'block';
+
+          // 👇 显示对应的导航按钮
+            const navBtn = document.getElementById('nav-videos');
+          if(navBtn) navBtn.style.display = 'inline-block';
 
           if(counterTotal) counterTotal.innerText = movieUrls.length;
           if (movieUrls.length > 1) {
