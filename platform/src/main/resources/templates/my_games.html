@@ -6,42 +6,31 @@
   <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
   <style>
     /* === 全局亮色主题 === */
-    body { background-color: #f8f9fa; color: #212529; } /* 背景改浅灰，字改深灰 */
+    body { background-color: #f8f9fa; color: #212529; }
 
-    /* 卡片样式：白底，浅灰边框 */
+    /* 卡片：白底，浅灰边框 */
     .card { background-color: #ffffff; border: 1px solid #dee2e6; transition: transform 0.2s; }
-    .card:hover { transform: translateY(-5px); border-color: #0d6efd; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15); }
+    .card:hover { transform: translateY(-5px); border-color: #28a745; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15); } /* 已拥有悬停绿色 */
 
     /* 导航栏：白底 */
     .navbar { background-color: #ffffff !important; border-bottom: 1px solid #dee2e6; box-shadow: 0 2px 4px rgba(0,0,0,.05); }
 
-    /* 标题左侧竖线颜色保持不变 */
-    .section-title { border-left: 5px solid #ffc107; padding-left: 15px; margin-bottom: 20px; color: #212529; }
-
-    /* 筛选框 */
-    .filter-box { background-color: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #dee2e6; }
-
-    /* 输入框适配 */
-    .form-control { background-color: #fff; color: #212529; border: 1px solid #ced4da; }
-    .form-control:focus { background-color: #fff; color: #212529; }
-
-    /* 表格文字颜色 */
-    .table { color: #212529; }
-    .table thead { background-color: #e9ecef; }
+    /* 标题左侧竖线 */
+    .section-title { border-left: 5px solid #28a745; padding-left: 15px; margin-bottom: 20px; color: #212529; }
   </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark mb-4">
+<nav class="navbar navbar-expand-lg navbar-light bg-white mb-4">
   <div class="container-fluid">
     <a class="navbar-brand text-warning fw-bold" href="/">🏆 游光阁</a>
     <div class="d-flex align-items-center ms-auto">
       <a href="/" class="btn btn-outline-secondary me-3">返回首页</a>
       <div class="dropdown">
-        <button class="btn btn-dark border-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        <button class="btn btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown">
           👤 <span th:text="${session.currentUser.username}">User</span>
         </button>
-        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+        <ul class="dropdown-menu dropdown-menu-end">
           <li><a class="dropdown-item" href="/my-games">🎮 我的库</a></li>
           <li><a class="dropdown-item" href="/password">🔒 修改密码</a></li>
           <li><hr class="dropdown-divider"></li>
@@ -55,9 +44,9 @@
 <div class="container">
   <h3 class="section-title">🎮 我的游戏库</h3>
 
-  <div th:if="${products == null or products.isEmpty()}" class="alert alert-secondary text-center mt-5">
+  <div th:if="${products == null or products.isEmpty()}" class="alert alert-light border text-center mt-5">
     <h4>你的库空空如也...</h4>
-    <p>快去 <a href="/" class="text-warning">商店首页</a> 挑选心仪的游戏吧！</p>
+    <p>快去 <a href="/" class="text-primary">商店首页</a> 挑选心仪的游戏吧！</p>
   </div>
 
   <div class="row row-cols-1 row-cols-md-5 g-4">
@@ -65,7 +54,7 @@
       <div class="card h-100">
         <img th:src="${prod.headerImage}" class="card-img-top" style="height: 120px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/300x150'">
         <div class="card-body p-2">
-          <h6 class="card-title text-truncate text-white" th:text="${prod.name}">Name</h6>
+          <h6 class="card-title text-truncate text-dark" th:text="${prod.name}">Name</h6>
           <div class="d-grid gap-2 mt-2">
             <button class="btn btn-sm btn-success disabled">已拥有</button>
             <a th:href="@{'/product/' + ${prod.productId}}" class="btn btn-sm btn-outline-secondary">查看详情</a>
