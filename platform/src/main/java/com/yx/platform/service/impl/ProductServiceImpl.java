@@ -188,4 +188,26 @@ public class ProductServiceImpl implements ProductService {
     public void updateProductStatus(Long productId, Integer status) {
         productMapper.updateStatus(productId, status);
     }
+
+    // 在类中实现该方法：
+
+    @Override
+    @Transactional // 务必开启事务，保证钱和游戏状态一致
+    public boolean refundProduct(Long userId, Long productId) {
+        // 1. 查询当初购买的价格
+        BigDecimal price = orderMapper.findPricePaid(userId, productId);
+
+        // 如果查不到价格，说明可能没买或者数据异常
+        if (price == null) {
+            return false;
+        }
+
+        // 2. 把钱退回给用户
+        userMapper.addBalance(userId, price);
+
+        // 3. 删除购买记录
+        orderMapper.deleteOrderItem(userId, productId);
+
+        return true;
+    }
 }

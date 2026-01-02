@@ -4,6 +4,7 @@ import com.yx.platform.entity.Product;
 import com.yx.platform.entity.SysUser;
 import com.yx.platform.mapper.ProductMapper;
 import com.yx.platform.mapper.UserMapper;
+import com.yx.platform.service.ProductService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class UserController {
 
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    private ProductService productService;
 
 
     // === 注册接口 ===
@@ -129,5 +133,61 @@ public class UserController {
         model.addAttribute("products", myGames);
 
         return "my_games"; // 跳转到 my_games.html
+    }
+
+
+    @PostMapping("/refund")
+    public String refund(@RequestParam Long productId, HttpSession session) {
+        SysUser user = (SysUser) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            boolean success = productService.refundProduct(user.getId(), productId);
+            if (success) {
+                // 退款成功，需要从数据库重新查用户，以刷新 Session 里的余额显示
+                SysUser updatedUser = userMapper.findById(user.getId());
+                session.setAttribute("currentUser", updatedUser);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 实际开发中可以将错误信息放入 Model 返回给页面
+        }
+
+        // 退款完成后刷新“我的游戏”页面
+        return "redirect:/my-games";
+    }
+
+
+    // 1. 显示充值页面
+    @GetMapping("/recharge")
+    public String rechargePage(HttpSession session) {
+        if (session.getAttribute("currentUser") == null) {
+            return "redirect:/login";
+        }
+        return "recharge";
+    }
+
+    // 2. 处理充值逻辑
+    @PostMapping("/recharge")
+    public String doRecharge(@RequestParam java.math.BigDecimal amount, HttpSession session) {
+        SysUser user = (SysUser) session.getAttribute("currentUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        // 简单校验：金额必须大于0
+        if (amount.compareTo(java.math.BigDecimal.ZERO) > 0) {
+            // 1. 数据库加钱
+            userMapper.addBalance(user.getId(), amount);
+
+            // 2. 刷新 Session 里的余额显示（否则页面上看起来还是旧的）
+            SysUser updatedUser = userMapper.findById(user.getId());
+            session.setAttribute("currentUser", updatedUser);
+        }
+
+        // 充值完跳回首页
+        return "redirect:/";
     }
 }

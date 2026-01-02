@@ -38,4 +38,8 @@ public interface UserMapper {
 
     @Update("UPDATE sys_user SET balance = balance - #{amount} WHERE id = #{userId} AND balance >= #{amount}")
     int deductBalance(@Param("userId") Long userId, @Param("amount") BigDecimal amount);
+
+
+    @org.apache.ibatis.annotations.Update("UPDATE sys_user SET balance = balance + #{amount} WHERE id = #{userId}")
+    void addBalance(@Param("userId") Long userId, @Param("amount") java.math.BigDecimal amount);
 }

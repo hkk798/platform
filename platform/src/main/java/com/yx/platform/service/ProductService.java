@@ -67,4 +67,6 @@ public interface ProductService {
 
     // 管理员：更新状态
     void updateProductStatus(Long productId, Integer status);
+
+    boolean refundProduct(Long userId, Long productId);
 }

@@ -26,4 +26,17 @@ public interface OrderMapper {
             "JOIN orders o ON oi.order_id = o.order_id " +
             "WHERE o.user_id = #{userId} AND oi.product_id = #{productId}")
     int countUserPurchased(@Param("userId") Long userId, @Param("productId") Long productId);
+
+
+    @Select("SELECT oi.price FROM order_item oi " +
+            "JOIN orders o ON oi.order_id = o.order_id " +
+            "WHERE o.user_id = #{userId} AND oi.product_id = #{productId} LIMIT 1")
+    BigDecimal findPricePaid(@Param("userId") Long userId, @Param("productId") Long productId);
+
+    // 2. 删除订单项 (从库中移除游戏)
+// 使用多表删除语法：DELETE T1 FROM T1 JOIN T2 ...
+    @org.apache.ibatis.annotations.Delete("DELETE oi FROM order_item oi " +
+            "JOIN orders o ON oi.order_id = o.order_id " +
+            "WHERE o.user_id = #{userId} AND oi.product_id = #{productId}")
+    void deleteOrderItem(@Param("userId") Long userId, @Param("productId") Long productId);
 }

@@ -60,6 +60,12 @@
           <h6 class="card-title text-truncate text-dark" th:text="${prod.name}">Name</h6>
           <div class="d-grid gap-2 mt-2">
             <button class="btn btn-sm btn-success disabled">已拥有</button>
+
+            <form action="/refund" method="post" onsubmit="return confirm('确定要退款吗？\n退款后游戏将从库中移除，金额将返还至余额。');">
+              <input type="hidden" name="productId" th:value="${prod.productId}">
+              <button type="submit" class="btn btn-sm btn-outline-danger w-100">💰 退款</button>
+            </form>
+
             <a th:href="@{'/product/' + ${prod.productId}}" class="btn btn-sm btn-outline-secondary">查看详情</a>
           </div>
         </div>
