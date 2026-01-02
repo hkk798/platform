@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import com.yx.platform.mapper.UserMapper;
 
 @Controller
 public class CartController {
 
     @Autowired
     private CartService cartService;
+    @Autowired
+    private UserMapper userMapper;
 
     // 辅助方法：获取当前登录用户ID
     private Long getUserId(HttpSession session) {
@@ -65,14 +68,32 @@ public class CartController {
         try {
             boolean success = cartService.checkout(userId);
             if (success) {
-                return "redirect:/"; // 下单成功回首页，或者去订单列表页
+                // === 【新增】刷新 Session 中的余额 ===
+                SysUser updatedUser = userMapper.findById(userId);
+                session.setAttribute("currentUser", updatedUser);
+                // ==================================
+
+                return "redirect:/payment/success";
             } else {
                 model.addAttribute("error", "购物车为空或库存不足");
                 return "cart";
             }
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", e.getMessage()); // 这里会显示“余额不足”
             return "cart";
         }
     }
+
+
+    @GetMapping("/payment/success")
+    public String paymentSuccess(HttpSession session) {
+        // 可选：检查用户是否登录，没登录不给看（或者不做限制也行，反正只是个静态展示页）
+        if (session.getAttribute("currentUser") == null) {
+            return "redirect:/login";
+        }
+        return "payment_success"; // 返回 templates/payment_success.html
+    }
+
+
 }

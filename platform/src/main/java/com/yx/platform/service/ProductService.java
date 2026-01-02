@@ -52,4 +52,19 @@ public interface ProductService {
      * 检查用户是否已拥有该游戏
      */
     boolean checkOwnership(Long userId, Long productId);
+
+
+
+    /**
+     * 获取首页轮播图数据
+     * (合并热门榜单和热议榜单，去重后取前10)
+     */
+    List<Product> getCarouselProducts();
+
+
+    // 管理员：获取所有商品
+    Map<String, Object> getAdminProductList(int pageNum, int pageSize);
+
+    // 管理员：更新状态
+    void updateProductStatus(Long productId, Integer status);
 }

@@ -5,6 +5,7 @@ import com.yx.platform.entity.CartItemVo;
 import com.yx.platform.mapper.CartMapper;
 import com.yx.platform.mapper.OrderMapper;
 import com.yx.platform.mapper.ProductMapper;
+import com.yx.platform.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,8 @@ public class CartService {
     private OrderMapper orderMapper;
     @Autowired
     private ProductMapper productMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     // 获取当前用户的购物车ID，如果没有就创建一个
     public Long getOrCreateCartId(Long userId) {
@@ -92,6 +95,16 @@ public class CartService {
         try {
             // 1. 计算总价
             BigDecimal totalAmount = calculateTotal(items);
+
+
+            // === 2. 【新增】执行扣款 ===
+            // 尝试扣除余额
+            int rows = userMapper.deductBalance(userId, totalAmount);
+            if (rows == 0) {
+                // 如果影响行数为 0，说明余额不足
+                throw new RuntimeException("支付失败：余额不足！当前需支付 " + totalAmount + " 元。");
+            }
+            // =========================
 
             // 2. 创建真实订单
             Order order = new Order();

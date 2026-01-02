@@ -112,8 +112,30 @@
         </div>
         <p class="text-muted mb-4" th:text="${product.shortDescription}">简介...</p>
         <div class="dev-info">
-          <div>开发商: <span th:text="${product.developers}">Valve</span></div>
           <div class="mt-1">发行商: <span th:text="${product.publishers}">Valve</span></div>
+
+          <div class="mt-2 d-flex align-items-baseline">
+            <span class="me-2">语言:</span>
+
+            <span th:if="${product.languageList != null and !product.languageList.isEmpty()}"
+                  class="d-inline-block text-truncate"
+                  style="max-width: 300px; cursor: help;"
+                  th:title="${#strings.listJoin(product.languageList, ', ')}"> <span th:each="lang, iter : ${product.languageList}"
+                                                                                     th:if="${iter.index < 4}"
+                                                                                     class="badge bg-light text-dark border me-1">
+              <span th:text="${lang}">English</span>
+          </span>
+
+          <span th:if="${product.languageList.size() > 4}"
+                class="badge bg-secondary text-white ms-1"
+                th:text="'+ ' + (${product.languageList.size() - 4})">
+              +10
+          </span>
+      </span>
+
+            <span th:if="${product.languageList == null or product.languageList.isEmpty()}" class="text-muted small">未知</span>
+          </div>
+
           <div class="mt-2">标签: <span class="badge bg-secondary text-light fw-normal" th:text="${product.genres}">Action</span></div>
         </div>
       </div>

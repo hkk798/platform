@@ -164,4 +164,12 @@ public class Product {
             return new ArrayList<>();
         }
     }
+
+    /**
+     * 前端通过 ${product.languageList} 调用
+     * 将 "['English', 'French']" 转为 List<String>
+     */
+    public List<String> getLanguageList() {
+        return parsePythonString(this.supportedLanguages);
+    }
 }

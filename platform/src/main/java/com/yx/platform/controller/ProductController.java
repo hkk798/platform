@@ -11,16 +11,24 @@ import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.Map;
+import com.yx.platform.mapper.UserMapper;
 
 @Controller
 public class ProductController {
 
     @Autowired
     private ProductService productService; // 改用 Service，不再直接调 Mapper
+    @Autowired
+    private UserMapper userMapper;
 
     // === 1. 首页：展示 Top 10 CCU 和 Top 10 Reviews ===
     @GetMapping("/")
     public String index(Model model) {
+        // --- 新增：获取轮播图数据 ---
+        List<Product> carouselList = productService.getCarouselProducts();
+        model.addAttribute("carouselList", carouselList);
+        // ------------------------
+
         // 1. 获取在线人数(CCU)最高的 10 个游戏
         List<Product> topCcuList = productService.getTopCcuProducts();
         model.addAttribute("topCcuList", topCcuList);
@@ -87,24 +95,28 @@ public class ProductController {
     // 对应 detail.html 里的表单提交：action="/product/buy"
 // === 修改后的购买接口 ===
     @PostMapping("/product/buy")
-    public String buy(@RequestParam Long productId, @RequestParam int quantity, HttpSession session) {
-        // 1. 获取当前登录用户
+    public String buy(@RequestParam Long productId, @RequestParam int quantity, HttpSession session, Model model) {
         SysUser currentUser = (SysUser) session.getAttribute("currentUser");
+        if (currentUser == null) return "redirect:/login";
 
-        // 如果未登录，跳转登录页
-        if (currentUser == null) {
-            return "redirect:/login";
-        }
+        try {
+            boolean success = productService.buyProduct(currentUser.getId(), productId, quantity);
 
-        // 2. 调用 Service 执行购买，传入 userId
-        boolean success = productService.buyProduct(currentUser.getId(), productId, quantity);
+            if (success) {
+                // === 【新增】刷新 Session 中的余额 ===
+                SysUser updatedUser = userMapper.findById(currentUser.getId());
+                session.setAttribute("currentUser", updatedUser);
+                // ==================================
 
-        if (success) {
-            // 购买成功回到首页
-            return "redirect:/";
-        } else {
-            // 失败回到详情页
-            return "redirect:/product/" + productId;
+                return "redirect:/";
+            } else {
+                return "redirect:/product/" + productId;
+            }
+        } catch (Exception e) {
+            // 如果详情页购买失败（余额不足），通常需要传错误信息回去
+            // 简单处理：跳回详情页，这里先打印日志
+            System.err.println("购买失败: " + e.getMessage());
+            return "redirect:/product/" + productId + "?error=balance"; // 可以在详情页处理这个参数
         }
     }
 

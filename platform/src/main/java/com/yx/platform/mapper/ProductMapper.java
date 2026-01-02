@@ -25,6 +25,7 @@ public interface ProductMapper {
     @Select("<script>" +
             "SELECT * FROM product1 " +
             "<where>" +
+            "  status = 1 " +
             // 1. 关键词 (如果有，必须满足)
             "  <if test='keyword != null and keyword != \"\"'>" +
             "    AND name LIKE CONCAT('%', #{keyword}, '%')" +
@@ -51,6 +52,7 @@ public interface ProductMapper {
     @Select("<script>" +
             "SELECT COUNT(*) FROM product1 " +
             "<where>" +
+            "  status = 1 " +
             "  <if test='keyword != null and keyword != \"\"'>" +
             "    AND name LIKE CONCAT('%', #{keyword}, '%')" +
             "  </if>" +
@@ -67,6 +69,7 @@ public interface ProductMapper {
     // 4. 详情：改为查 product1
     // ⚠️注意：请确认您的 product1 表里的主键列名是 app_id 还是 appid
     // 如果报错 "Unknown column 'app_id'"，请把下面的 app_id 改为 appid
+    // 详情页也建议加，防止用户通过 URL 直接访问下架商品（可选）
     @Select("SELECT * FROM product1 WHERE appid = #{id}")
     Product findById(Long id);
 
@@ -89,4 +92,18 @@ public interface ProductMapper {
             "WHERE o.user_id = #{userId}")
     List<Product> findPurchasedByUserId(Long userId);
 
+
+
+    // === 【新增】管理员专用方法 ===
+
+    // 1. 管理员列表：查所有商品，不分状态
+    @Select("SELECT * FROM product1 ORDER BY appid DESC LIMIT #{offset}, #{pageSize}")
+    List<Product> findAdminProducts(@Param("offset") int offset, @Param("pageSize") int pageSize);
+
+    @Select("SELECT COUNT(*) FROM product1")
+    long countAllProducts();
+
+    // 2. 上下架操作
+    @Update("UPDATE product1 SET status = #{status} WHERE appid = #{id}")
+    void updateStatus(@Param("id") Long id, @Param("status") Integer status);
 }

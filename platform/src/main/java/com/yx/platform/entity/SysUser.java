@@ -1,6 +1,7 @@
 package com.yx.platform.entity;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 public class SysUser {
 
@@ -18,6 +19,8 @@ public class SysUser {
 
     /** 创建时间 (对应 DATETIME) */
     private LocalDateTime createTime;
+
+    private BigDecimal balance;
 
     // ==========================================
     // 下面是 Getter 和 Setter 方法
@@ -72,5 +75,14 @@ public class SysUser {
                 ", username='" + username + '\'' +
                 ", role='" + role + '\'' +
                 '}';
+    }
+
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 }

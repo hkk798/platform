@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import com.yx.platform.entity.SysUser; // ⚠️确保这里导入了你刚才写的实体类
 import java.util.List;
+import java.math.BigDecimal; // 导包
 
 // @Mapper 告诉 Spring：这个接口是用来操作数据库的
 @Mapper
@@ -33,4 +34,8 @@ public interface UserMapper {
     // === 新增：修改密码 ===
     @Update("UPDATE sys_user SET password = #{newPassword} WHERE id = #{userId}")
     int updatePassword(@Param("userId") Long userId, @Param("newPassword") String newPassword);
+
+
+    @Update("UPDATE sys_user SET balance = balance - #{amount} WHERE id = #{userId} AND balance >= #{amount}")
+    int deductBalance(@Param("userId") Long userId, @Param("amount") BigDecimal amount);
 }

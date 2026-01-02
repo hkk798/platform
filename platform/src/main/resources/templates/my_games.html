@@ -27,6 +27,9 @@
     <div class="d-flex align-items-center ms-auto">
       <a href="/" class="btn btn-outline-secondary me-3">返回首页</a>
       <div class="dropdown">
+        <span class="badge bg-warning text-dark me-3" title="账户余额">
+            💰 ￥<span th:text="${session.currentUser.balance}">0.00</span>
+        </span>
         <button class="btn btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown">
           👤 <span th:text="${session.currentUser.username}">User</span>
         </button>

@@ -42,10 +42,14 @@ public class UserController {
         SysUser user = userMapper.login(username, password);
         if (user != null) {
             session.setAttribute("currentUser", user);
-            // 登录成功，跳回首页
-            return "redirect:/";
+
+            // === 【修改】判断角色 ===
+            if ("admin".equals(user.getRole())) {
+                return "redirect:/admin/products"; // 管理员去后台
+            } else {
+                return "redirect:/"; // 普通用户去首页
+            }
         } else {
-            // 登录失败，跳回登录页并带上错误标记
             return "redirect:/login?error=true";
         }
     }
