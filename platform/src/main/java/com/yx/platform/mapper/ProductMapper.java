@@ -70,9 +70,6 @@ public interface ProductMapper {
     @Select("SELECT * FROM product1 WHERE appid = #{id}")
     Product findById(Long id);
 
-    // 5. 扣库存：改为操作 product1
-    @Update("UPDATE product1 SET stock = stock - #{quantity} WHERE appid = #{productId} AND stock >= #{quantity}")
-    int reduceStock(@Param("productId") Long productId, @Param("quantity") int quantity);
 
     // 推荐：改为查 product1
     @Select("SELECT * FROM product1 ORDER BY release_date DESC LIMIT 3")

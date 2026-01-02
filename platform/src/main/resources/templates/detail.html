@@ -133,12 +133,12 @@
           <a href="/my-games" class="btn btn-outline-info btn-sm mt-2">前往库中查看</a>
         </div>
 
-        <form th:if="${!isOwned}" action="/product/buy" method="post" class="d-grid gap-2">
+        <form th:if="${!isOwned}" action="/cart/add" method="post" class="d-grid gap-2">
           <input type="hidden" name="productId" th:value="${product.productId}">
           <input type="hidden" name="quantity" value="1">
 
           <button type="submit" class="btn btn-success fw-bold px-4">
-            立即购买
+            加入购物车
           </button>
         </form>
 

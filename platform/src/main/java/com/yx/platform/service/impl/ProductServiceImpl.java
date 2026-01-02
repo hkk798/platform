@@ -89,11 +89,8 @@ public class ProductServiceImpl implements ProductService {
             return false;
         }
 
-        // 2. 尝试扣减库存
-        int rows = productMapper.reduceStock(productId, quantity);
-        if (rows <= 0) {
-            return false; // 库存不足，购买失败
-        }
+
+
 
         // 3. 生成订单记录（之前缺失的逻辑）
         try {

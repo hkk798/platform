@@ -110,8 +110,6 @@ public class CartService {
 
                 // 内部的 try-catch (处理单个商品报错，不影响整体)
                 try {
-                    // 3.1 尝试扣库存
-                    //productMapper.reduceStock(item.getProductId(), item.getQuantity());
                     // 3.2 保存订单项
                     orderMapper.saveOrderItem(orderId, item.getProductId(), 1, item.getPrice());
                 } catch (Exception dbError) {
