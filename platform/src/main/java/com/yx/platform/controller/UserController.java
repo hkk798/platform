@@ -30,20 +30,20 @@ public class UserController {
 
 
     // === 注册接口 ===
-    @PostMapping("/register")
+    @PostMapping("/register1")
     // 2. 去掉 @RequestBody，直接用 SysUser 接收表单数据
-    public String register(SysUser user) {
+    public String register1(SysUser user) {
         // 保存到数据库
         userMapper.save(user);
 
         // 3. 注册成功后，重定向跳转到登录页面
-        return "redirect:/login";
+        return "redirect:/login1";
     }
 
     // === 登录接口 ===
-    @PostMapping("/login")
-    public String login(String username, String password, HttpSession session) {
-        SysUser user = userMapper.login(username, password);
+    @PostMapping("/login1")
+    public String login1(String username, String password, HttpSession session) {
+        SysUser user = userMapper.login1(username, password);
         if (user != null) {
             session.setAttribute("currentUser", user);
 
@@ -54,7 +54,7 @@ public class UserController {
                 return "redirect:/"; // 普通用户去首页
             }
         } else {
-            return "redirect:/login?error=true";
+            return "redirect:/login1?error=true";
         }
     }
 
@@ -71,20 +71,20 @@ public class UserController {
         // 销毁 session，相当于把用户踢下线
         session.invalidate();
         // 跳回首页
-        return "redirect:/login?msg=logout";
+        return "redirect:/login1?msg=logout";
     }
 
     // === 2. 修改密码页面 ===
-    @GetMapping("/password")
+    @GetMapping("/password1")
     public String passwordPage(HttpSession session, Model model) {
         if (session.getAttribute("currentUser") == null) {
-            return "redirect:/login";
+            return "redirect:/login1";
         }
-        return "password"; // 跳转到 password.html
+        return "password1"; // 跳转到 password.html
     }
 
     // === 3. 处理修改密码逻辑 ===
-    @PostMapping("/password/update")
+    @PostMapping("/password1/update")
     public String updatePassword(
             @RequestParam String oldPassword,
             @RequestParam String newPassword,
@@ -94,20 +94,26 @@ public class UserController {
 
         SysUser currentUser = (SysUser) session.getAttribute("currentUser");
         if (currentUser == null) {
-            return "redirect:/login";
+            return "redirect:/login1";
         }
 
         // 1. 校验两次新密码是否一致
         if (!newPassword.equals(confirmPassword)) {
             model.addAttribute("error", "两次输入的新密码不一致！");
-            return "password";
+            return "password1";
         }
 
         // 2. 校验旧密码是否正确 (从数据库查最新数据比对)
         SysUser userInDb = userMapper.findById(currentUser.getId());
         if (!userInDb.getPassword().equals(oldPassword)) {
             model.addAttribute("error", "旧密码错误！");
-            return "password";
+            return "password1";
+        }
+
+        // 3.校验旧密码与新密码是否一致
+        if(newPassword.equals(oldPassword)) {
+            model.addAttribute("error", "新密码不能与旧密码相同！");
+            return "password1";
         }
 
         // 3. 执行更新
@@ -117,7 +123,7 @@ public class UserController {
         session.removeAttribute("currentUser");
         model.addAttribute("msg", "密码修改成功，请使用新密码重新登录");
 
-        return "login";
+        return "login1";
     }
 
 
@@ -125,7 +131,7 @@ public class UserController {
     public String myGames(HttpSession session, Model model) {
         SysUser user = (SysUser) session.getAttribute("currentUser");
         if (user == null) {
-            return "redirect:/login";
+            return "redirect:/login1";
         }
 
         // 查询该用户买过的游戏
@@ -140,7 +146,7 @@ public class UserController {
     public String refund(@RequestParam Long productId, HttpSession session) {
         SysUser user = (SysUser) session.getAttribute("currentUser");
         if (user == null) {
-            return "redirect:/login";
+            return "redirect:/login1";
         }
 
         try {
@@ -164,7 +170,7 @@ public class UserController {
     @GetMapping("/recharge")
     public String rechargePage(HttpSession session) {
         if (session.getAttribute("currentUser") == null) {
-            return "redirect:/login";
+            return "redirect:/login1";
         }
         return "recharge";
     }
@@ -174,7 +180,7 @@ public class UserController {
     public String doRecharge(@RequestParam java.math.BigDecimal amount, HttpSession session) {
         SysUser user = (SysUser) session.getAttribute("currentUser");
         if (user == null) {
-            return "redirect:/login";
+            return "redirect:/login1";
         }
 
         // 简单校验：金额必须大于0

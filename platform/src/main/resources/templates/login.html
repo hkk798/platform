@@ -26,7 +26,7 @@
 
     <div th:if="${param.msg}" class="alert alert-success alert-dismissible fade show" role="alert">
         <span th:if="${#strings.equals(param.msg, 'passwordChanged')}">密码修改成功，请重新登录！</span>
-        <span th:if="${#strings.equals(param.msg, 'registered')}">注册成功，请直接登录！</span>
+        <span th:if="${#strings.equals(param.msg, 'register1ed')}">注册成功，请直接登录！</span>
         <span th:if="${#strings.equals(param.msg, 'logout')}">您已安全退出登录。</span>
 
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -51,7 +51,7 @@
 
     <div class="mt-4 text-center">
         <span class="text-muted">还没有账号？</span>
-        <a href="/register" class="text-info text-decoration-none">去注册</a>
+        <a href="/register1" class="text-info text-decoration-none">去注册</a>
     </div>
 </div>
 

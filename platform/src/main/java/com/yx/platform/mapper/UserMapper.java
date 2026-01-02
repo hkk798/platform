@@ -25,7 +25,7 @@ public interface UserMapper {
     // 新增：登录查询
     // 意思就是：去找找有没有同时满足 "username=?" 和 "password=?" 的人
     @Select("SELECT * FROM sys_user WHERE username = #{username} AND password = #{password}")
-    SysUser login(String username, String password);
+    SysUser login1(String username, String password);
 
     // === 新增：根据ID查找用户（用于修改密码前验证） ===
     @Select("SELECT * FROM sys_user WHERE id = #{id}")

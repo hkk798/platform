@@ -30,7 +30,7 @@ public class CartController {
     @GetMapping("/cart")
     public String viewCart(HttpSession session, Model model) {
         Long userId = getUserId(session);
-        if (userId == null) return "redirect:/login"; // 没登录就去登录
+        if (userId == null) return "redirect:/login1"; // 没登录就去登录
 
         List<CartItemVo> cartItems = cartService.getMyCart(userId);
         model.addAttribute("cartItems", cartItems);
@@ -44,7 +44,7 @@ public class CartController {
     // 【修改点】去掉 int quantity 参数，或者保留但不用它
     public String addToCart(Long productId, HttpSession session) {
         Long userId = getUserId(session);
-        if (userId == null) return "redirect:/login";
+        if (userId == null) return "redirect:/login1";
 
         // 调用 Service 时也不传 quantity，默认内部处理为 1
         cartService.addToCart(userId, productId);
@@ -63,7 +63,7 @@ public class CartController {
     @GetMapping("/order/confirm")
     public String checkout(HttpSession session, Model model) {
         Long userId = getUserId(session);
-        if (userId == null) return "redirect:/login";
+        if (userId == null) return "redirect:/login1";
 
         try {
             boolean success = cartService.checkout(userId);
@@ -90,7 +90,7 @@ public class CartController {
     public String paymentSuccess(HttpSession session) {
         // 可选：检查用户是否登录，没登录不给看（或者不做限制也行，反正只是个静态展示页）
         if (session.getAttribute("currentUser") == null) {
-            return "redirect:/login";
+            return "redirect:/login1";
         }
         return "payment_success"; // 返回 templates/payment_success.html
     }

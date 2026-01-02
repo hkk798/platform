@@ -24,8 +24,8 @@
         <a href="/search" class="btn btn-outline-primary ms-3 me-auto">🎮 更多游戏 / 筛选</a>
         <div class="d-flex align-items-center">
             <div th:if="${session.currentUser == null}">
-                <a href="/login" class="btn btn-outline-secondary me-2">登录</a>
-                <a href="/register" class="btn btn-primary">注册</a>
+                <a href="/login1" class="btn btn-outline-secondary me-2">登录</a>
+                <a href="/register1" class="btn btn-primary">注册</a>
             </div>
             <div th:if="${session.currentUser != null}" class="d-flex align-items-center">
 
@@ -47,7 +47,7 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="/my-games">🎮 我的库</a></li>
-                        <li><a class="dropdown-item" href="/password">🔒 修改密码</a></li>
+                        <li><a class="dropdown-item" href="/password1">🔒 修改密码</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/logout">退出登录</a></li>
                     </ul>

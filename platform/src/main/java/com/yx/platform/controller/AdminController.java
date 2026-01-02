@@ -27,7 +27,7 @@ public class AdminController {
     // 1. 商品管理列表页
     @GetMapping("/products")
     public String productList(@RequestParam(defaultValue = "1") int page, HttpSession session, Model model) {
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!isAdmin(session)) return "redirect:/login1";
 
         Map<String, Object> result = productService.getAdminProductList(page, 20);
         model.addAllAttributes(result);
@@ -38,7 +38,7 @@ public class AdminController {
     // 2. 切换上下架状态
     @GetMapping("/product/status")
     public String toggleStatus(Long id, Integer status, HttpSession session) {
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!isAdmin(session)) return "redirect:/login1";
 
         productService.updateProductStatus(id, status);
         return "redirect:/admin/products"; // 操作完刷新列表

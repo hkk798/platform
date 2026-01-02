@@ -97,7 +97,7 @@ public class ProductController {
     @PostMapping("/product/buy")
     public String buy(@RequestParam Long productId, @RequestParam int quantity, HttpSession session, Model model) {
         SysUser currentUser = (SysUser) session.getAttribute("currentUser");
-        if (currentUser == null) return "redirect:/login";
+        if (currentUser == null) return "redirect:/login1";
 
         try {
             boolean success = productService.buyProduct(currentUser.getId(), productId, quantity);
